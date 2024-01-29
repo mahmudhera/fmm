@@ -194,6 +194,7 @@ int main(int argc, char* argv[]) {
                     // print to stdout
                     cout << p_s << " " << p_d << " " << d << " " << seed << " " << S << " " << D << " " << I << " " << N_shared << " " << num_kmers_with_single_subst << " " << num_kmers_with_single_delt << " " << num_kmers_with_single_insert << " " << num_shared_kmers << endl;
 
+                }
             }
         }
     }
