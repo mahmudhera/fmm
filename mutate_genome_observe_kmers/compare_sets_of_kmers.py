@@ -14,7 +14,9 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     num_kmers_shared = 0
 
     # get num of shared kmers
-    shared_kmers_set = set(kmers_orig).intersection(set(kmers_mutated))
+    mutated_kmers_set = set(kmers_mutated)
+    orig_kmers_set = set(kmers_orig)
+    shared_kmers_set = orig_kmers_set.intersection(mutated_kmers_set)
     num_kmers_shared = len(shared_kmers_set)
     
     # create a hash set of all k-1 -mers in the original string
@@ -47,6 +49,7 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
                 num_kmers_single_substitution += 1
                 break
 
+    print('Here..')
     num_kmers_single_substitution_dict = Counter()
     for kmer in kmers_orig:
         # generate all kmers that are 1 substitution away from kmer
@@ -54,7 +57,7 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
             for base in ['A', 'C', 'G', 'T']:
                 if base == kmer[i]:
                     continue
-                if kmer[:i] + base + kmer[i+1:] in kmers_mutated:
+                if kmer[:i] + base + kmer[i+1:] in mutated_kmers_set:
                     if kmer in num_kmers_single_substitution_dict:
                         num_kmers_single_substitution_dict[kmer] += 1
                     else:
