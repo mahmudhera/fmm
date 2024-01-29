@@ -4,6 +4,10 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     """
     Returns the number of k-mers that are single substitutions, single insertion, single deletion
     """
+
+    # print the number of kmers in the original string and the mutated string
+    print(len(kmers_orig), len(kmers_mutated))
+
     num_kmers_single_substitution = 0
     num_kmers_single_deletion = 0
     num_kmers_single_insertion = 0
