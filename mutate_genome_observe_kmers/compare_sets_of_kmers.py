@@ -42,6 +42,9 @@ def get_num_kmers_single_subst_delt_insert(kmers_orig, kmers_mutated):
             if kmer[:i] + kmer[i+1:] in all_k_minus_1_mers_mutated_1_deletion:
                 num_kmers_single_substitution += 1
                 break
+
+    for kmer in kmers_orig:
+        for i in range(len(kmer)):
             if kmer[:i] + kmer[i+1:] in all_k_minus_1_mers_mutated:
                 num_kmers_single_deletion += 1
                 break
