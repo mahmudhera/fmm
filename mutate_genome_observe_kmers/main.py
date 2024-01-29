@@ -3,8 +3,7 @@ import argparse
 from read_genome import clean_genome_string
 from mutation_model_simulator import mutation_model
 from read_genome import get_kmers
-from compare_sets_of_kmers import get_num_shared_kmers
-from compare_sets_of_kmers import get_num_kmers_single_subst_delt_insert
+from compare_sets_of_kmers import get_num_kmers_single_subst_delt_insert_shared
 import os
 import subprocess
 import itertools
@@ -81,7 +80,7 @@ if __name__ == '__main__':
         kmers_mutated = get_kmers(mutated_string, k)
 
         # get the observations using the two sets of k-mers: S_calc, D_calc, I_calc, N_sh_calc
-        S_calc, D_calc, I_calc, N_sh_calc = get_num_kmers_single_subst_delt_insert(kmers_orig, kmers_mutated)
+        S_calc, D_calc, I_calc, N_sh_calc = get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated)
 
         # print everything: p_s, p_d, d, L1, L2, S, D, I, N_sh, S_calc, D_calc, I_calc, N_sh_calc
         print(p_s, p_d, d, L1, L2, S, D, I, N_sh, S_calc, D_calc, I_calc, N_sh_calc)
