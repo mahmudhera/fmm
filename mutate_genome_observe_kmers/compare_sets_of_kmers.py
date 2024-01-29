@@ -1,3 +1,5 @@
+from collections import Counter
+
 def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     """
     Returns the number of k-mers that are single substitutions, single insertion, single deletion
@@ -41,7 +43,7 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
                 num_kmers_single_substitution += 1
                 break
 
-    num_kmers_single_substitution_dict = {}
+    num_kmers_single_substitution_dict = Counter()
     for kmer in kmers_orig:
         # generate all kmers that are 1 substitution away from kmer
         for i in range(len(kmer)):
@@ -54,10 +56,9 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
                     else:
                         num_kmers_single_substitution_dict[kmer] = 1
 
-    # sort the kmers based on their counts
-    sorted_kmers = sorted(num_kmers_single_substitution_dict.items(), key=lambda kv: kv[1], reverse=True)
-    for kmer in sorted_kmers[:10]:
-        print(kmer, num_kmers_single_substitution_dict[kmer])
+    # print the top 10 kmers with the most number of single substitutions
+    for kmer, num in num_kmers_single_substitution_dict.most_common(10):
+        print(kmer, num)
 
     for kmer in kmers_orig:
         for i in range(len(kmer)):
