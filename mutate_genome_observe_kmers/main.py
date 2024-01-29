@@ -8,6 +8,16 @@ import os
 import subprocess
 import itertools
 import time
+import multiprocessing
+
+
+
+def call_get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated, thread_id, return_dict):
+    """
+    Calls the function get_num_kmers_single_subst_delt_insert_shared and stores the result in return_dict
+    """
+    return_dict[thread_id] = get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated)
+
 
 # in this script, we will read a genome, vary our mutation rates, and then mutated genome using the varying mutation rates.
 
@@ -43,6 +53,9 @@ if __name__ == '__main__':
 
     # vary p_s, p_d, d using the mutation rates
     num_completed = 0
+    thread_id = 0
+    return_dict = {}
+    processes_list = []
     for p_s, p_d, d, seed in list( itertools.product(mutation_rates, mutation_rates, mutation_rates, range(num_simulations)) ):
 
         # measure time taken
@@ -80,7 +93,24 @@ if __name__ == '__main__':
         kmers_mutated = get_kmers(mutated_string, k)
 
         # get the observations using the two sets of k-mers: S_calc, D_calc, I_calc, N_sh_calc
-        S_calc, D_calc, I_calc, N_sh_calc = get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated)
+        # call function: get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated) using a new thread
+
+        # create a new thread
+        thread_id += 1
+        p = multiprocessing.Process(target=call_get_num_kmers_single_subst_delt_insert_shared, args=(kmers_orig, kmers_mutated, thread_id, return_dict))
+        p.start()
+        processes_list.append(p)
+
+    # join all the threads
+    for p in processes_list:
+        p.join()
+
+    thread_id = 0
+    for p_s, p_d, d, seed in list( itertools.product(mutation_rates, mutation_rates, mutation_rates, range(num_simulations)) ):
+
+        # retrieve results from the thread
+        thread_id += 1
+        S_calc, D_calc, I_calc, N_sh_calc = return_dict[thread_id]
 
         # print everything: p_s, p_d, d, L1, L2, S, D, I, N_sh, S_calc, D_calc, I_calc, N_sh_calc
         print(p_s, p_d, d, S, S_calc, D, D_calc, I, I_calc, N_sh, N_sh_calc)
