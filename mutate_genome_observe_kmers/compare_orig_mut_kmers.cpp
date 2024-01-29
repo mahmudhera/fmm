@@ -25,19 +25,6 @@ vector<string> get_kmers(string s, int ksize) {
     return kmers;
 }
 
-// given two vectors of kmers, return the number of shared kmers
-size_t get_num_shared_kmers(vector<string>& kmers1, vector<string>& kmers2) {
-    unordered_set<string> kmer_set1(kmers1.begin(), kmers1.end());
-    unordered_set<string> kmer_set2(kmers2.begin(), kmers2.end());
-    int num_shared_kmers = 0;
-    for (auto kmer : kmer_set1) {
-        if (kmer_set2.find(kmer) != kmer_set2.end()) {
-            num_shared_kmers++;
-        }
-    }
-    return num_shared_kmers;
-}
-
 // given two vectors of kmers, return the number of kmers with single subst, delt, insert, and shared
 tuple<size_t, size_t, size_t, size_t> get_num_kmers_with_single_subst_delt_insert_shared(vector<string>& kmers_orig, vector<string>& kmers_mutated) {
     // create set of kmers from vectors
