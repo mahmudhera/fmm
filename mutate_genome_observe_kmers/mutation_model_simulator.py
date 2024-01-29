@@ -78,7 +78,7 @@ class mutation_model:
             final_str_list.append( strings_to_insert[i] )
 
         if k is None:
-            return ''.join(final_str_list), None, None, None
+            return ''.join(final_str_list), None, None, None, None
 
         num_kmers_single_insertion = 0
         num_kmers_single_deletion = 0
@@ -96,8 +96,6 @@ class mutation_model:
                 num_kmers_single_insertion += 1
             if sum1 == 0 and sum2 == 0:
                 num_kmers_no_mutation += 1
-
-        
 
         return ''.join(final_str_list), num_kmers_single_substitution, num_kmers_single_insertion, num_kmers_single_deletion, num_kmers_no_mutation
 

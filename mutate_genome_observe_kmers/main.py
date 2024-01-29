@@ -53,7 +53,7 @@ if __name__ == '__main__':
             mm = mutation_model(seed, genome_string, p_s, p_d, d)
 
             # mutate the string, get the mutated string and observations: S, D, I, N_sh
-            mutated_string, S, I, D, N_sh = mm.mutate_string()
+            mutated_string, S, I, D, N_sh = mm.mutate_string(k)
 
             # write the mutated string in a file, filename format: genome_name_mutated_p_s_p_d_d_seed.fasta
             # in the first line of the fasta, write S, D, I, N_sh. Format: "> mutated_string_S_D_I_N_sh"
