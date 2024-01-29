@@ -165,6 +165,9 @@ int main(int argc, char* argv[]) {
                 for (int seed = 0; seed < num_simulations; seed++) {
                     // generate mutated genome filename
                     string mutated_genome_name = orig_genome_name + "_mutated_" + to_string(p_s) + "_" + to_string(p_d) + "_" + to_string(d) + "_" + to_string(seed) + ".fasta";
+                    
+                    // print mutated genome filename
+                    cout << mutated_genome_name << endl;
 
                     // read mutated genome string, first line format: "> mutated_S_D_I_N_shared", read S, D, I, N_shared
                     ifstream mutated_file(mutated_genome_name);
