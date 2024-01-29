@@ -6,6 +6,8 @@ from read_genome import get_kmers
 from compare_sets_of_kmers import get_num_shared_kmers
 from compare_sets_of_kmers import get_num_kmers_single_subst_delt_insert
 import os
+import subprocess
+import itertools
 
 # in this script, we will read a genome, vary our mutation rates, and then mutated genome using the varying mutation rates.
 
@@ -41,7 +43,7 @@ if __name__ == '__main__':
 
     # vary p_s, p_d, d using the mutation rates
     num_completed = 0
-    for p_s, p_d, d, seed in list(zip(mutation_rates, mutation_rates, mutation_rates, range(num_simulations))):
+    for p_s, p_d, d, seed in list( itertools.product(mutation_rates, mutation_rates, mutation_rates, range(num_simulations)) ):
         num_completed += 1
         print('Completed: ' + str(num_completed) + ' out of ' + str(len(mutation_rates)**3 * num_simulations))
         
@@ -49,17 +51,9 @@ if __name__ == '__main__':
         # if mutated file already exists, then skip this simulation
         mutated_filename = genome_name + '_mutated_' + str(p_s) + '_' + str(p_d) + '_' + str(d) + '_' + str(seed) + '.fasta'
         if not os.path.exists(mutated_filename):
-            # create a mutation model using the original string, the seed, and the mutation rates
-            mm = mutation_model(seed, genome_string, p_s, p_d, d)
-
-            # mutate the string, get the mutated string and observations: S, D, I, N_sh
-            mutated_string, S, I, D, N_sh = mm.mutate_string(k)
-
-            # write the mutated string in a file, filename format: genome_name_mutated_p_s_p_d_d_seed.fasta
-            # in the first line of the fasta, write S, D, I, N_sh. Format: "> mutated_S_D_I_N_sh\nmutated_string"
-            with open(mutated_filename, 'w') as f:
-                f.write('> mutated_' + str(S) + '_' + str(D) + '_' + str(I) + '_' + str(N_sh) + '\n')
-                f.write(mutated_string)
+            # mutate the genome file using command: ./mutate_genome seed, genome_filename, p_s, p_d, d, output_filename, kmer_size
+            command = './mutate_genome ' + str(seed) + ' ' + genome_name + ' ' + str(p_s) + ' ' + str(p_d) + ' ' + str(d) + ' ' + mutated_filename + ' ' + str(k)
+            subprocess.call(command, shell=True)
 
         # read the file for S, D, I, N_sh
         with open(mutated_filename, 'r') as f:
