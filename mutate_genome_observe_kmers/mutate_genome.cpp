@@ -210,7 +210,7 @@ int main(int argc, char* argv[])
     // command line arguments: seed, original_filename, p_s, p_d, d, output_filename, kmer_size
 
     // print usage
-    if (argc != 7) {
+    if (argc != 8) {
         cout << "Usage: " << argv[0] << " seed orig_genome_filename p_s p_d d output_filename kmer_size" << endl;
         return 1;
     }
