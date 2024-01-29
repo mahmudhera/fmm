@@ -15,7 +15,7 @@ using namespace std;
 std::vector<char> alphabet = {'A', 'C', 'G', 'T'};
 
 // given a string and kmer size, return its kmers
-vector<string> get_kmers(string& s, int ksize) {
+vector<string> get_kmers(string s, int ksize) {
     vector<string> kmers;
     for (int i = 0; i < s.length() - ksize + 1; i++) {
         kmers.push_back(s.substr(i, ksize));
