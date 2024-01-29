@@ -224,13 +224,14 @@ int main(int argc, char* argv[])
     string output_filename = argv[6];
     int ksize = atoi(argv[7]);
 
-    // read original genome file, skip the first line
+    // read original genome fasta file, skip the first line
     ifstream orig_file(orig_filename);
-    string header_line;
-    string orig_string;
-    getline(orig_file, header_line);
-    getline(orig_file, orig_string);
-    orig_file.close();
+    string line;
+    string orig_string = "";
+    getline(orig_file, line);
+    while (getline(orig_file, line)) {
+        orig_string += line;
+    }
 
     // strip the original string of all non-ACGT characters
     orig_string.erase(remove_if(orig_string.begin(), orig_string.end(), [](char c) { return !isalpha(c); }), orig_string.end());    
