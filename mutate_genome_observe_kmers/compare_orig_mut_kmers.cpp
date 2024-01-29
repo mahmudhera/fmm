@@ -178,6 +178,9 @@ int main(int argc, char* argv[]) {
                         mutated_genome += line;
                     }
 
+                    // print mutated genome length, S, D, I, N_shared
+                    cout << mutated_genome.length() << " " << S << " " << D << " " << I << " " << N_shared << endl;
+
                     // close file
                     mutated_file.close();
 
