@@ -8,6 +8,7 @@ from compare_sets_of_kmers import get_num_kmers_single_subst_delt_insert
 import os
 import subprocess
 import itertools
+import time
 
 # in this script, we will read a genome, vary our mutation rates, and then mutated genome using the varying mutation rates.
 
@@ -44,8 +45,9 @@ if __name__ == '__main__':
     # vary p_s, p_d, d using the mutation rates
     num_completed = 0
     for p_s, p_d, d, seed in list( itertools.product(mutation_rates, mutation_rates, mutation_rates, range(num_simulations)) ):
-        num_completed += 1
-        print('Completed: ' + str(num_completed) + ' out of ' + str(len(mutation_rates)**3 * num_simulations))
+
+        # measure time taken
+        start_time = time.time()
         
         # mutated filename format: genome_name_mutated_p_s_p_d_d_seed.fasta
         # if mutated file already exists, then skip this simulation
@@ -84,3 +86,10 @@ if __name__ == '__main__':
 
         # print everything: p_s, p_d, d, L1, L2, S, D, I, N_sh, S_calc, D_calc, I_calc, N_sh_calc
         print(p_s, p_d, d, L1, L2, S, D, I, N_sh, S_calc, D_calc, I_calc, N_sh_calc)
+
+        # increment num_completed
+        num_completed += 1
+        print('Completed: ' + str(num_completed) + ' out of ' + str(len(mutation_rates)**3 * num_simulations))
+
+        # print time taken
+        print('Time taken: ' + str(time.time() - start_time))

@@ -163,6 +163,11 @@ int main(int argc, char* argv[]) {
         for (double p_d : delt_rates) {
             for (double d : insert_rates) {
                 for (int seed = 0; seed < num_simulations; seed++) {
+
+                    // measure time
+                    auto start = chrono::steady_clock::now();
+
+
                     // generate mutated genome filename, use two digits after decimal point
                     char mutated_genome_name_c[100];
                     sprintf(mutated_genome_name_c, "ecoli.fasta_mutated_%.2f_%.2f_%.2f_%d.fasta", p_s, p_d, d, seed);
@@ -207,6 +212,9 @@ int main(int argc, char* argv[]) {
                     // print to stdout
                     cout << p_s << " " << p_d << " " << d << " " << seed << " " << S << " " << D << " " << I << " " << N_shared << " " << num_kmers_with_single_subst << " " << num_kmers_with_single_delt << " " << num_kmers_with_single_insert << " " << num_shared_kmers << endl;
 
+                    // measure time
+                    auto end = chrono::steady_clock::now();
+                    cout << "Elapsed time in seconds : " << chrono::duration_cast<chrono::seconds>(end - start).count() << " sec" << endl;
                 }
             }
         }
