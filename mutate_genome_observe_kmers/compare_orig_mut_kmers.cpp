@@ -163,8 +163,12 @@ int main(int argc, char* argv[]) {
         for (double p_d : delt_rates) {
             for (double d : insert_rates) {
                 for (int seed = 0; seed < num_simulations; seed++) {
-                    // generate mutated genome filename
-                    string mutated_genome_name = orig_genome_name + "_mutated_" + to_string(p_s) + "_" + to_string(p_d) + "_" + to_string(d) + "_" + to_string(seed) + ".fasta";
+                    // generate mutated genome filename, use two digits after decimal point
+                    char mutated_genome_name_c[100];
+                    sprintf(mutated_genome_name_c, "ecoli.fasta_mutated_%.2f_%.2f_%.2f_%d.fasta", p_s, p_d, d, seed);
+
+                    // convert to string
+                    string mutated_genome_name(mutated_genome_name_c);
                     
                     // print mutated genome filename
                     cout << mutated_genome_name << endl;
