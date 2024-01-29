@@ -41,6 +41,24 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
                 num_kmers_single_substitution += 1
                 break
 
+    num_kmers_single_substitution_dict = {}
+    for kmer in kmers_orig:
+        # generate all kmers that are 1 substitution away from kmer
+        for i in range(len(kmer)):
+            for base in ['A', 'C', 'G', 'T']:
+                if base == kmer[i]:
+                    continue
+                if kmer[:i] + base + kmer[i+1:] in kmers_mutated:
+                    if kmer in num_kmers_single_substitution_dict:
+                        num_kmers_single_substitution_dict[kmer] += 1
+                    else:
+                        num_kmers_single_substitution_dict[kmer] = 1
+
+    # sort the kmers based on their counts
+    sorted_kmers = sorted(num_kmers_single_substitution_dict.items(), key=lambda kv: kv[1], reverse=True)
+    for kmer in sorted_kmers[:10]:
+        print(kmer, num_kmers_single_substitution_dict[kmer])
+
     for kmer in kmers_orig:
         for i in range(len(kmer)):
             if kmer[:i] + kmer[i+1:] in all_k_minus_1_mers_mutated and kmer not in shared_kmers_set:
