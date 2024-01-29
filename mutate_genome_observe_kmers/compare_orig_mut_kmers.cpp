@@ -137,13 +137,16 @@ int main(int argc, char* argv[]) {
 
     // read original genome
     string orig_genome_name = "ecoli.fasta";
-    string orig_genome;
+    string orig_genome = "";
     ifstream orig_file(orig_genome_name);
     string line;
     getline(orig_file, line); // skip the first line
     while (getline(orig_file, line)) {
         orig_genome += line;
     }
+
+    // print original genome length
+    cout << orig_genome.length() << endl;
 
     // close file
     orig_file.close();
@@ -170,7 +173,7 @@ int main(int argc, char* argv[]) {
                     sscanf(line.c_str(), "> mutated_%zu_%zu_%zu_%zu", &S, &D, &I, &N_shared);
 
                     // read mutated genome string
-                    string mutated_genome;
+                    string mutated_genome = "";
                     while (getline(mutated_file, line)) {
                         mutated_genome += line;
                     }
