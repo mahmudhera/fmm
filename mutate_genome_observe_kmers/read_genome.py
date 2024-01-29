@@ -19,7 +19,7 @@ def clean_genome_string(genome_string):
     Removes all non-alphabet characters from a genome string
     """
     alphabet = set('ACGT')
-    return ''.join(filter(alphabet.__contains__, genome_string)
+    return ''.join(filter(alphabet.__contains__, genome_string))
                    
 def get_kmers(genome_string, k):
     """
