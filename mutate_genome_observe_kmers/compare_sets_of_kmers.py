@@ -67,6 +67,9 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     for kmer, num in num_kmers_single_substitution_dict.most_common(10):
         print(kmer, num)
 
+    # print the number of kmers in num_kmers_single_substitution_dict
+    print(len(num_kmers_single_substitution_dict))
+
     for kmer in kmers_orig:
         for i in range(len(kmer)):
             if kmer[:i] + kmer[i+1:] in all_k_minus_1_mers_mutated and kmer not in shared_kmers_set:
