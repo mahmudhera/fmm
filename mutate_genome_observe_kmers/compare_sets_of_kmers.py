@@ -1,17 +1,15 @@
-def get_num_shared_kmers(kmers_orig, kmers_mutated):
-    """
-    Returns the number of shared k-mers between two lists of k-mers
-    """
-    return len( set(kmers_orig).intersection( set(kmers_mutated) ) )
-
-
-def get_num_kmers_single_subst_delt_insert(kmers_orig, kmers_mutated):
+def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     """
     Returns the number of k-mers that are single substitutions, single insertion, single deletion
     """
     num_kmers_single_substitution = 0
     num_kmers_single_deletion = 0
     num_kmers_single_insertion = 0
+    num_kmers_shared = 0
+
+    # get num of shared kmers
+    shared_kmers_set = set(kmers_orig).intersection(set(kmers_mutated))
+    num_kmers_shared = len(shared_kmers_set)
     
     # create a hash set of all k-1 -mers in the original string
     all_k_minus_1_mers_orig = set()
@@ -39,13 +37,13 @@ def get_num_kmers_single_subst_delt_insert(kmers_orig, kmers_mutated):
     # sets needed: all_k_minus_1_mers_mutated
     for kmer in kmers_orig:
         for i in range(len(kmer)):
-            if kmer[:i] + kmer[i+1:] in all_k_minus_1_mers_mutated_1_deletion:
+            if kmer[:i] + kmer[i+1:] in all_k_minus_1_mers_mutated_1_deletion and kmer not in shared_kmers_set:
                 num_kmers_single_substitution += 1
                 break
 
     for kmer in kmers_orig:
         for i in range(len(kmer)):
-            if kmer[:i] + kmer[i+1:] in all_k_minus_1_mers_mutated:
+            if kmer[:i] + kmer[i+1:] in all_k_minus_1_mers_mutated and kmer not in shared_kmers_set:
                 num_kmers_single_deletion += 1
                 break
     
@@ -54,8 +52,8 @@ def get_num_kmers_single_subst_delt_insert(kmers_orig, kmers_mutated):
     # sets needed: all_k_minus_1_mers_orig
     for kmer in kmers_mutated:
         for i in range(len(kmer)):
-            if kmer[:i] + kmer[i+1:] in all_k_minus_1_mers_orig:
+            if kmer[:i] + kmer[i+1:] in all_k_minus_1_mers_orig and kmer not in shared_kmers_set:
                 num_kmers_single_insertion += 1
                 break
 
-    return num_kmers_single_substitution, num_kmers_single_deletion, num_kmers_single_insertion
+    return num_kmers_single_substitution, num_kmers_single_deletion, num_kmers_single_insertion, num_kmers_shared
