@@ -56,18 +56,16 @@ if __name__ == '__main__':
             mutated_string, S, I, D, N_sh = mm.mutate_string(k)
 
             # write the mutated string in a file, filename format: genome_name_mutated_p_s_p_d_d_seed.fasta
-            # in the first line of the fasta, write S, D, I, N_sh. Format: "> mutated_string_S_D_I_N_sh"
+            # in the first line of the fasta, write S, D, I, N_sh. Format: "> mutated_S_D_I_N_sh\nmutated_string"
             with open(mutated_filename, 'w') as f:
-                f.write('> ' + mutated_string + '_' + str(S) + '_' + str(D) + '_' + str(I) + '_' + str(N_sh) + '\n')
+                f.write('> mutated_' + str(S) + '_' + str(D) + '_' + str(I) + '_' + str(N_sh) + '\n')
                 f.write(mutated_string)
 
         # read the file for S, D, I, N_sh
         with open(mutated_filename, 'r') as f:
-            mutated_string = f.readline().strip().split('_')[0][1:]
-            S = int(f.readline().strip().split('_')[1])
-            D = int(f.readline().strip().split('_')[2])
-            I = int(f.readline().strip().split('_')[3])
-            N_sh = int(f.readline().strip().split('_')[4])
+            first_line = f.readline()
+            S, D, I, N_sh = first_line[1:].strip().split('_')[1:]
+            S, D, I, N_sh = int(S), int(D), int(I), int(N_sh)
         
         # do not process any further if only_sim is True
         if only_sim:
