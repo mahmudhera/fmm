@@ -6,7 +6,7 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     """
 
     # print the number of kmers in the original string and the mutated string
-    print(len(kmers_orig), len(kmers_mutated))
+    # print(len(kmers_orig), len(kmers_mutated))
 
     num_kmers_single_substitution = 0
     num_kmers_single_deletion = 0
@@ -51,24 +51,33 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
 
     print('Here..')
     num_kmers_single_substitution_dict = Counter()
+    new_kmers_single_substitution_dict = Counter()
     for kmer in kmers_orig:
         # generate all kmers that are 1 substitution away from kmer
         for i in range(len(kmer)):
             for base in ['A', 'C', 'G', 'T']:
                 if base == kmer[i]:
                     continue
-                if kmer[:i] + base + kmer[i+1:] in mutated_kmers_set:
+                new_kmer = kmer[:i] + base + kmer[i+1:]
+                if new_kmer in mutated_kmers_set:
                     if kmer in num_kmers_single_substitution_dict:
                         num_kmers_single_substitution_dict[kmer] += 1
+                        new_kmers_single_substitution_dict[new_kmer] += 1
                     else:
                         num_kmers_single_substitution_dict[kmer] = 1
+                        new_kmers_single_substitution_dict[new_kmer] = 1
 
     # print the top 10 kmers with the most number of single substitutions
+    print ('This is in orig kmers')
     for kmer, num in num_kmers_single_substitution_dict.most_common(10):
         print(kmer, num)
 
+    print ('This is in mutated kmers')
+    for kmer, num in new_kmers_single_substitution_dict.most_common(10):
+        print(kmer, num)
+
     # print the number of kmers in num_kmers_single_substitution_dict
-    print(len(num_kmers_single_substitution_dict))
+    print(len(num_kmers_single_substitution_dict), len(new_kmers_single_substitution_dict))
 
     for kmer in kmers_orig:
         for i in range(len(kmer)):
