@@ -54,6 +54,7 @@ if __name__ == '__main__':
         if not os.path.exists(mutated_filename):
             # mutate the genome file using command: ./mutate_genome seed, genome_filename, p_s, p_d, d, output_filename, kmer_size
             command = './mutate_genome ' + str(seed) + ' ' + genome_name + ' ' + str(p_s) + ' ' + str(p_d) + ' ' + str(d) + ' ' + mutated_filename + ' ' + str(k)
+            print (command)
             subprocess.call(command, shell=True)
 
         # read the file for S, D, I, N_sh
