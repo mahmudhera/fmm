@@ -233,9 +233,12 @@ int main(int argc, char* argv[])
         orig_string += line;
     }
 
-    // strip the original string of all non-ACGT characters
-    orig_string.erase(remove_if(orig_string.begin(), orig_string.end(), [](char c) { return !isalpha(c); }), orig_string.end());    
+    // make the orig string all uppercase
+    transform(orig_string.begin(), orig_string.end(), orig_string.begin(), ::toupper);
 
+    // strip the original string of all non-ACGT characters
+    orig_string.erase(remove_if(orig_string.begin(), orig_string.end(), [](char c) { return c != 'A' && c != 'C' && c != 'G' && c != 'T'; }), orig_string.end());
+    
     // create mutation model
     mutation_model model(seed, orig_string, p_s, p_d, d);
 
