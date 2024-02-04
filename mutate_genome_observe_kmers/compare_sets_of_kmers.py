@@ -43,7 +43,7 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     # for each k-mer in the original string, check if it has a 1 delt k-1 mer in all_k_minus_1_mers_mutated
     # if it does, then it is single deletion
     # sets needed: all_k_minus_1_mers_mutated
-    for kmer in kmers_orig:
+    for kmer in orig_kmers_set:
         for i in range(len(kmer)):
             if kmer[:i] + kmer[i+1:] in all_k_minus_1_mers_mutated_1_deletion and kmer not in shared_kmers_set:
                 num_kmers_single_substitution += 1
@@ -52,7 +52,7 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     print('Here..')
     num_kmers_single_substitution_dict = Counter()
     new_kmers_single_substitution_dict = Counter()
-    for kmer in kmers_orig:
+    for kmer in orig_kmers_set:
         # generate all kmers that are 1 substitution away from kmer
         for i in range(len(kmer)):
             for base in ['A', 'C', 'G', 'T']:
@@ -79,7 +79,7 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     # print the number of kmers in num_kmers_single_substitution_dict
     print(len(num_kmers_single_substitution_dict), len(new_kmers_single_substitution_dict))
 
-    for kmer in kmers_orig:
+    for kmer in orig_kmers_set:
         for i in range(len(kmer)):
             if kmer[:i] + kmer[i+1:] in all_k_minus_1_mers_mutated and kmer not in shared_kmers_set:
                 num_kmers_single_deletion += 1
@@ -88,7 +88,7 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     # for each k-mer in the mutated string, check if it has a 1 delt k-1 mer in all_k_minus_1_mers_orig
     # if it does, then it is single insertion
     # sets needed: all_k_minus_1_mers_orig
-    for kmer in kmers_mutated:
+    for kmer in orig_kmers_set:
         for i in range(len(kmer)):
             if kmer[:i] + kmer[i+1:] in all_k_minus_1_mers_orig and kmer not in shared_kmers_set:
                 num_kmers_single_insertion += 1
