@@ -1,4 +1,7 @@
 from collections import Counter
+from scipy.sparse import csr_matrix 
+from scipy.sparse.csgraph import maximum_bipartite_matching
+
 
 def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     """
@@ -68,16 +71,87 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
                         new_kmers_single_substitution_dict[new_kmer] = 1
 
     # print the top 10 kmers with the most number of single substitutions
-    print ('This is in orig kmers')
+    print ('Mostly occuring 10 kmers marked for subst. (from the set of orig kmers:)')
     for kmer, num in num_kmers_single_substitution_dict.most_common(10):
         print(kmer, num)
 
-    print ('This is in mutated kmers')
+    print ('Mostly occuring 10 kmers marked for subst. (from the set of new kmers:)')
     for kmer, num in new_kmers_single_substitution_dict.most_common(10):
         print(kmer, num)
 
     # print the number of kmers in num_kmers_single_substitution_dict
+    print( 'number of kmers marked for single char subst. in the orig and the new kmers, respectively: ' )
     print(len(num_kmers_single_substitution_dict), len(new_kmers_single_substitution_dict))
+
+
+    ####################
+    # maximal bipartite matching start
+    ####################
+
+    # create a graph with the orig kmers as the left nodes and the new kmers as the right nodes
+    # the edges are between the orig kmer and the new kmer if the new kmer is 1 substitution away from the orig kmer
+    # the weight of the edge is the number of times the new kmer is 1 substitution away from the orig kmer
+    # the goal is to find the maximum matching of the graph
+    # the maximum matching will give us the number of single substitutions
+    # the maximum matching is the number of edges in the graph that are not overlapping
+
+    left_kmers_to_indices = {}
+    right_kmers_to_indices = {}
+    double_indices_to_edges = {}
+
+    left_kmers = list(num_kmers_single_substitution_dict.keys())
+    for i, kmer in enumerate(left_kmers):
+        left_kmers_to_indices[kmer] = i
+
+    right_kmers = list(new_kmers_single_substitution_dict.keys())
+    for i, kmer in enumerate(right_kmers):
+        right_kmers_to_indices[kmer] = i
+
+    for kmer in left_kmers:
+        # generate all kmers that are 1 substitution away from kmer
+        for i in range(len(kmer)):
+            for base in ['A', 'C', 'G', 'T']:
+                if base == kmer[i]:
+                    continue
+                new_kmer = kmer[:i] + base + kmer[i+1:]
+                if new_kmer in right_kmers:
+                    left_kmer_index = left_kmers_to_indices[kmer]
+                    right_kmer_index = right_kmers_to_indices[new_kmer]
+                    if (left_kmer_index, right_kmer_index) in double_indices_to_edges:
+                        double_indices_to_edges[(left_kmer_index, right_kmer_index)] += 1
+                    else:
+                        double_indices_to_edges[(left_kmer_index, right_kmer_index)] = 1
+
+    # get the left indices, right indices, and the weights of the edges
+    left_indices = []
+    right_indices = []
+    weights = []
+
+    for (left_index, right_index), weight in double_indices_to_edges.items():
+        left_indices.append(left_index)
+        right_indices.append(right_index)
+        weights.append(weight)
+
+    # create a csr matrix
+    num_left_nodes = len(left_kmers)
+    num_right_nodes = len(right_kmers)
+    csr_matrix = csr_matrix((weights, (left_indices, right_indices)), shape=(num_left_nodes, num_right_nodes))
+
+    # get the maximum matching
+    max_matching = maximum_bipartite_matching(csr_matrix, perm_type='column')
+
+    # get the number of values that are not -1
+    num_edges_max_matching = 0
+    for value in max_matching:
+        if value != -1:
+            num_edges_max_matching += 1
+
+    print('Number of edges in the maximum matching: ', num_edges_max_matching)
+
+    
+    ####################
+    # maximal bipartite matching end
+    ####################
 
     for kmer in orig_kmers_set:
         for i in range(len(kmer)):
