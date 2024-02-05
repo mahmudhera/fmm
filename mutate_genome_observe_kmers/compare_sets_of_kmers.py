@@ -123,6 +123,7 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
                         double_indices_to_edges[(left_kmer_index, right_kmer_index)] = 1
 
     # get the left indices, right indices, and the weights of the edges
+    print('Constructing the graph..')
     left_indices = []
     right_indices = []
     weights = []
@@ -136,6 +137,8 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     num_left_nodes = len(left_kmers)
     num_right_nodes = len(right_kmers)
     csr_matrix = csr_matrix((weights, (left_indices, right_indices)), shape=(num_left_nodes, num_right_nodes))
+
+    print ('Graph created., now finding the maximum matching..')
 
     # get the maximum matching
     max_matching = maximum_bipartite_matching(csr_matrix, perm_type='column')
