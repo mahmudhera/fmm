@@ -136,6 +136,14 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     right_indices = []
     weights = []
 
+    # show >1 entries in weights
+    counter = 0
+    for (left_index, right_index), weight in double_indices_to_edges.items():
+        if weight > 1:
+            print(left_kmers[left_index], right_kmers[right_index], weight)
+            counter += 1
+    print ('Number of entries with >1 weights: ', counter)
+
     for (left_index, right_index), weight in double_indices_to_edges.items():
         left_indices.append(left_index)
         right_indices.append(right_index)
