@@ -95,6 +95,8 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     # the maximum matching will give us the number of single substitutions
     # the maximum matching is the number of edges in the graph that are not overlapping
 
+    print('Constructing the graph..')
+
     left_kmers_to_indices = {}
     right_kmers_to_indices = {}
     double_indices_to_edges = {}
@@ -107,14 +109,17 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     for i, kmer in enumerate(right_kmers):
         right_kmers_to_indices[kmer] = i
 
-    for kmer in left_kmers:
+    left_kmers_set = set(left_kmers)
+    right_kmers_set = set(right_kmers)
+
+    for kmer in left_kmers_set:
         # generate all kmers that are 1 substitution away from kmer
         for i in range(len(kmer)):
             for base in ['A', 'C', 'G', 'T']:
                 if base == kmer[i]:
                     continue
                 new_kmer = kmer[:i] + base + kmer[i+1:]
-                if new_kmer in right_kmers:
+                if new_kmer in right_kmers_set:
                     left_kmer_index = left_kmers_to_indices[kmer]
                     right_kmer_index = right_kmers_to_indices[new_kmer]
                     if (left_kmer_index, right_kmer_index) in double_indices_to_edges:
@@ -123,7 +128,6 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
                         double_indices_to_edges[(left_kmer_index, right_kmer_index)] = 1
 
     # get the left indices, right indices, and the weights of the edges
-    print('Constructing the graph..')
     left_indices = []
     right_indices = []
     weights = []
