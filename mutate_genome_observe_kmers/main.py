@@ -41,11 +41,11 @@ if __name__ == '__main__':
     L1 = len(genome_string)
 
     # vary the mutation rates
-    mutation_rates = [0.01, 0.05, 0.1]
+    mutation_rates = [0.00, 0.01, 0.05, 0.1]
 
     # vary p_s, p_d, d using the mutation rates
     num_completed = 0
-    for p_s, p_d, d, seed in list( itertools.product(mutation_rates, mutation_rates, mutation_rates, range(num_simulations)) ):
+    for seed, p_d, d, p_s in list( itertools.product(range(num_simulations), mutation_rates, mutation_rates, mutation_rates) ):
 
         # measure time taken
         start_time = time.time()
