@@ -23,6 +23,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_sim', type=int, default=100, help='number of simulations to run')
     parser.add_argument('--k', type=int, default=21, help='kmer size')
     parser.add_argument('--only_sim', action='store_true', help='only simulate, do not compare kmers', default=False)
+    parser.add_argument('--run_once', action='store_true', help='only run the first iteration', default=False)
 
     # parse the arguments
     args = parser.parse_args()
@@ -30,6 +31,7 @@ if __name__ == '__main__':
     num_simulations = args.num_sim
     k = args.k
     only_sim = args.only_sim
+    run_once = args.run_once
 
     # read the genome
     genome_string = read_genome(genome_name)
@@ -92,3 +94,7 @@ if __name__ == '__main__':
 
         # print time taken
         print('Time taken: ' + str(time.time() - start_time))
+
+        # break if run_once is True
+        if run_once:
+            break
