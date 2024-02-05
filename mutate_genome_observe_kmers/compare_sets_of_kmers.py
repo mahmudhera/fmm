@@ -56,6 +56,8 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     num_kmers_single_substitution_dict = Counter()
     new_kmers_single_substitution_dict = Counter()
     for kmer in orig_kmers_set:
+        if kmer in shared_kmers_set:
+            continue
         # generate all kmers that are 1 substitution away from kmer
         for i in range(len(kmer)):
             for base in ['A', 'C', 'G', 'T']:
@@ -63,6 +65,8 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
                     continue
                 new_kmer = kmer[:i] + base + kmer[i+1:]
                 if new_kmer in mutated_kmers_set:
+                    if new_kmer in shared_kmers_set:
+                        continue
                     if kmer in num_kmers_single_substitution_dict:
                         num_kmers_single_substitution_dict[kmer] += 1
                         new_kmers_single_substitution_dict[new_kmer] += 1
