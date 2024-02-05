@@ -140,12 +140,12 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
     # create a csr matrix
     num_left_nodes = len(left_kmers)
     num_right_nodes = len(right_kmers)
-    csr_matrix = csr_matrix((weights, (left_indices, right_indices)), shape=(num_left_nodes, num_right_nodes))
+    graph_matrix = csr_matrix((weights, (left_indices, right_indices)), shape=(num_left_nodes, num_right_nodes))
 
     print ('Graph created., now finding the maximum matching..')
 
     # get the maximum matching
-    max_matching = maximum_bipartite_matching(csr_matrix, perm_type='column')
+    max_matching = maximum_bipartite_matching(graph_matrix, perm_type='column')
 
     # get the number of values that are not -1
     num_edges_max_matching = 0
