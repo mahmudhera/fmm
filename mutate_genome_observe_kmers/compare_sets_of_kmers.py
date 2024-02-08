@@ -3,7 +3,7 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import maximum_bipartite_matching
 
 
-def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
+def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated, k_plus_one_mers_orig=None, k_plus_one_mers_mutated=None):
     """
     Returns the number of k-mers that are single substitutions, single insertion, single deletion
     """
@@ -187,4 +187,68 @@ def get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated):
                 num_kmers_single_insertion += 1
                 break
 
+    ########################################
+    # match using k+1 mers
+    ########################################
+    if k_plus_one_mers_mutated is not None and k_plus_one_mers_orig is not None:
+        count_num_kmers_single_subst_using_k_plus_one_mers(k_plus_one_mers_orig, k_plus_one_mers_mutated)
+            
+
     return num_kmers_single_substitution, num_kmers_single_deletion, num_kmers_single_insertion, num_kmers_shared
+
+
+def count_num_kmers_single_subst_using_k_plus_one_mers(k_plus_one_mers_orig, k_plus_one_mers_mutated):
+    kmer_to_kplusone_mers_orig = {}
+    kmers_orig_set = set()
+    for long_kmer in k_plus_one_mers_orig:
+        kmer1 = long_kmer[:-1]
+        kmer2 = long_kmer[1:]
+        kmers_orig_set.add(kmer1)
+        kmers_orig_set.add(kmer2)
+        if kmer1 in kmer_to_kplusone_mers_orig:
+            kmer_to_kplusone_mers_orig[kmer1][0] = long_kmer
+        else:
+            kmer_to_kplusone_mers_orig[kmer1] = [long_kmer, None]
+
+        if kmer2 in kmer_to_kplusone_mers_orig:
+            kmer_to_kplusone_mers_orig[kmer2][-1] = long_kmer
+        else:
+            kmer_to_kplusone_mers_orig[kmer2] = [None, long_kmer]
+
+    # every kmer now gives us two long kmers. first one: the long kmer where this kmer is the first kmer, second one: the long kmer where this kmer is the second kmer
+
+    kmer_to_kplusone_mers_mutated = {}
+    kmers_mutated_set = set()
+    for long_kmer in k_plus_one_mers_mutated:
+        kmer1 = long_kmer[:-1]
+        kmer2 = long_kmer[1:]
+        kmers_mutated_set.add(kmer1)
+        kmers_mutated_set.add(kmer2)
+        if kmer1 in kmer_to_kplusone_mers_mutated:
+            kmer_to_kplusone_mers_mutated[kmer1][0] = long_kmer
+        else:
+            kmer_to_kplusone_mers_mutated[kmer1] = [long_kmer, None]
+        if kmer2 in kmer_to_kplusone_mers_mutated:
+            kmer_to_kplusone_mers_mutated[kmer2][-1] = long_kmer
+        else:
+            kmer_to_kplusone_mers_mutated[kmer2] = [None, long_kmer]
+
+    kmers_in_orig_marked_for_single_subst = set()
+    kmers_in_mutated_marked_for_single_subst = set()
+
+    for kmer in kmers_orig_set:
+        if kmer in kmers_mutated_set:
+            continue
+        for i in range(len(kmer)):
+            for base in ['A', 'C', 'G', 'T']:
+                new_kmer = kmer[:i] + base + kmer[i+1:]
+                if base == kmer[i] or new_kmer in kmers_orig_set:
+                    continue
+                if new_kmer in kmers_mutated_set:
+                    kmers_in_orig_marked_for_single_subst.add(kmer)
+                    kmers_in_mutated_marked_for_single_subst.add(new_kmer)
+
+    print('Number of kmers marked for single char subst. in the orig and the new kmers, respectively: ')
+    print(len(kmers_in_orig_marked_for_single_subst), len(kmers_in_mutated_marked_for_single_subst))
+                    
+                    

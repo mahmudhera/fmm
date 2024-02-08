@@ -78,12 +78,14 @@ if __name__ == '__main__':
 
         # get k-mers in the original string
         kmers_orig = get_kmers(genome_string, k)
+        long_kmers_orig = get_kmers(genome_string, k+1)
 
         # get k-mers in the mutated string
         kmers_mutated = get_kmers(mutated_string, k)
+        long_kmers_mutated = get_kmers(mutated_string, k+1)
 
         # get the observations using the two sets of k-mers: S_calc, D_calc, I_calc, N_sh_calc
-        S_calc, D_calc, I_calc, N_sh_calc = get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated)
+        S_calc, D_calc, I_calc, N_sh_calc = get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated, long_kmers_orig, long_kmers_mutated)
 
         # print everything: p_s, p_d, d, L1, L2, S, D, I, N_sh, S_calc, D_calc, I_calc, N_sh_calc
         print(p_s, p_d, d, S, S_calc, D, D_calc, I, I_calc, N_sh, N_sh_calc)
