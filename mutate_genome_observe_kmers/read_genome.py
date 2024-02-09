@@ -28,4 +28,4 @@ def get_kmers(genome_string, k):
     kmers = []
     for i in range(len(genome_string)-k+1):
         kmers.append(genome_string[i:i+k])
-    return list( set(kmers) )
+    return kmers
