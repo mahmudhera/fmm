@@ -84,6 +84,11 @@ if __name__ == '__main__':
         kmers_mutated = get_kmers(mutated_string, k)
         long_kmers_mutated = get_kmers(mutated_string, k+1)
 
+        # test num of shared kmers by two ways
+        num_shared_kmers_ = set(kmers_orig).intersection(set(kmers_mutated))
+        print(len(num_shared_kmers_), N_sh)
+        continue
+
         # get the observations using the two sets of k-mers: S_calc, D_calc, I_calc, N_sh_calc
         S_calc, D_calc, I_calc, N_sh_calc = get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated, long_kmers_orig, long_kmers_mutated)
 
