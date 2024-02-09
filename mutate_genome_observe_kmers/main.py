@@ -58,6 +58,9 @@ if __name__ == '__main__':
     num_completed = 0
     for seed, p_d, d, p_s in list( itertools.product(range(num_simulations), mutation_rates, mutation_rates, mutation_rates) ):
 
+        # expected value of n_sh
+        n_sh_expected = (L1 - k + 1) * (1 - p_s - p_d)**(k) * (1.0 + d) ** (1 - k)
+
         # measure time taken
         start_time = time.time()
         
@@ -94,7 +97,7 @@ if __name__ == '__main__':
         # test num of shared kmers by two ways
         shared_kmers_set = set(kmers_orig).intersection(set(kmers_mutated))
         num_shared_kmers = sum([ kmers_orig_to_count[kmer] for kmer in shared_kmers_set ])
-        print(p_s, p_d, d, num_shared_kmers, N_sh, num_shared_kmers/N_sh, len(shared_kmers_set), len(shared_kmers_set)/N_sh)
+        print(p_s, p_d, d, num_shared_kmers, N_sh, num_shared_kmers/N_sh, len(shared_kmers_set), len(shared_kmers_set)/N_sh, n_sh_expected)
         continue
 
         # get the observations using the two sets of k-mers: S_calc, D_calc, I_calc, N_sh_calc
