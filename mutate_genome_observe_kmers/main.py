@@ -40,6 +40,17 @@ if __name__ == '__main__':
     # get the length of the genome
     L1 = len(genome_string)
 
+    # get k-mers in the original string
+    kmers_orig = get_kmers(genome_string, k)
+    long_kmers_orig = get_kmers(genome_string, k+1)
+
+    kmers_orig_to_count = {}
+    for kmer in kmers_orig:
+        if kmer in kmers_orig_to_count:
+            kmers_orig_to_count[kmer] += 1
+        else:
+            kmers_orig_to_count[kmer] = 1
+
     # vary the mutation rates
     mutation_rates = [0.01, 0.05, 0.1]
 
@@ -76,17 +87,6 @@ if __name__ == '__main__':
         # L2 = length of the mutated string
         L2 = len(mutated_string)
 
-        # get k-mers in the original string
-        kmers_orig = get_kmers(genome_string, k)
-        long_kmers_orig = get_kmers(genome_string, k+1)
-
-        kmers_orig_to_count = {}
-        for kmer in kmers_orig:
-            if kmer in kmers_orig_to_count:
-                kmers_orig_to_count[kmer] += 1
-            else:
-                kmers_orig_to_count[kmer] = 1
-
         # get k-mers in the mutated string
         kmers_mutated = get_kmers(mutated_string, k)
         long_kmers_mutated = get_kmers(mutated_string, k+1)
@@ -94,7 +94,7 @@ if __name__ == '__main__':
         # test num of shared kmers by two ways
         shared_kmers_set = set(kmers_orig).intersection(set(kmers_mutated))
         num_shared_kmers = sum([ kmers_orig_to_count[kmer] for kmer in shared_kmers_set ])
-        print(p_s, p_d, d, num_shared_kmers, N_sh)
+        print(p_s, p_d, d, num_shared_kmers, N_sh, num_shared_kmers/N_sh)
         continue
 
         # get the observations using the two sets of k-mers: S_calc, D_calc, I_calc, N_sh_calc
