@@ -248,6 +248,8 @@ def count_num_kmers_single_subst_using_k_plus_one_mers(k_plus_one_mers_orig, k_p
                     if i != 0 and i != len(kmer)-1:
                         kmers_in_orig_marked_for_single_subst.add(kmer)
                         kmers_in_mutated_marked_for_single_subst.add(new_kmer)
+                    
+                    '''
                     if i == 0:
                         orig_long_kmer_where_this_is_second = kmer_to_kplusone_mers_orig[kmer][1]
                         mutated_long_kmer_where_this_is_second = kmer_to_kplusone_mers_mutated[new_kmer][1]
@@ -265,6 +267,7 @@ def count_num_kmers_single_subst_using_k_plus_one_mers(k_plus_one_mers_orig, k_p
                             if orig_long_kmer_where_this_is_first[-1] == orig_long_kmer_where_this_is_first[-1]:
                                 kmers_in_orig_marked_for_single_subst.add(kmer)
                                 kmers_in_mutated_marked_for_single_subst.add(new_kmer)
+                    '''
 
     print('Number of kmers marked for single char subst. in the orig and the new kmers, respectively: ')
     print(len(kmers_in_orig_marked_for_single_subst), len(kmers_in_mutated_marked_for_single_subst))
