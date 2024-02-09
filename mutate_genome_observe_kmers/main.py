@@ -63,7 +63,7 @@ if __name__ == '__main__':
         
         # mutated filename format: genome_name_mutated_p_s_p_d_d_seed.fasta
         # if mutated file already exists, then skip this simulation
-        mutated_filename = genome_name + '_mutated_' + str(p_s) + '_' + str(p_d) + '_' + str(d) + '_' + str(seed) + '.fasta'
+        mutated_filename = genome_name + '_mutated_' + str(p_s) + '_' + str(p_d) + '_' + str(d) + '_' + str(k) + '_' +  str(seed) + '.fasta'
         if not os.path.exists(mutated_filename):
             # mutate the genome file using command: ./mutate_genome seed, genome_filename, p_s, p_d, d, output_filename, kmer_size
             command = './mutate_genome ' + str(seed) + ' ' + genome_name + ' ' + str(p_s) + ' ' + str(p_d) + ' ' + str(d) + ' ' + mutated_filename + ' ' + str(k)
