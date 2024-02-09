@@ -80,13 +80,20 @@ if __name__ == '__main__':
         kmers_orig = get_kmers(genome_string, k)
         long_kmers_orig = get_kmers(genome_string, k+1)
 
+        kmers_orig_to_count = {}
+        for kmer in kmers_orig:
+            if kmer in kmers_orig_to_count:
+                kmers_orig_to_count[kmer] += 1
+            else:
+                kmers_orig_to_count[kmer] = 1
+
         # get k-mers in the mutated string
         kmers_mutated = get_kmers(mutated_string, k)
         long_kmers_mutated = get_kmers(mutated_string, k+1)
 
         # test num of shared kmers by two ways
         shared_kmers_set = set(kmers_orig).intersection(set(kmers_mutated))
-        num_shared_kmers = sum([ kmers_orig.count(kmer) for kmer in shared_kmers_set ])
+        num_shared_kmers = sum([ kmers_orig_to_count[kmer] for kmer in shared_kmers_set ])
         print(len(num_shared_kmers), N_sh)
         continue
 
