@@ -98,13 +98,13 @@ if __name__ == '__main__':
         shared_kmers_set = set(kmers_orig).intersection(set(kmers_mutated))
         num_shared_kmers = sum([ kmers_orig_to_count[kmer] for kmer in shared_kmers_set ])
         print(p_s, p_d, d, num_shared_kmers, N_sh, num_shared_kmers/N_sh, len(shared_kmers_set), len(shared_kmers_set)/N_sh, n_sh_expected)
-        continue
+        #continue
 
         # get the observations using the two sets of k-mers: S_calc, D_calc, I_calc, N_sh_calc
         S_calc, D_calc, I_calc, N_sh_calc = get_num_kmers_single_subst_delt_insert_shared(kmers_orig, kmers_mutated, long_kmers_orig, long_kmers_mutated)
 
         # print everything: p_s, p_d, d, L1, L2, S, D, I, N_sh, S_calc, D_calc, I_calc, N_sh_calc
-        print(p_s, p_d, d, S, S_calc, D, D_calc, I, I_calc, N_sh, N_sh_calc)
+        print(p_s, p_d, d, S, S_calc, S/S_calc, D, D_calc, I, I_calc, N_sh, N_sh_calc)
 
         # increment num_completed
         num_completed += 1
