@@ -154,9 +154,7 @@ tuple<double, double, double> estimate_mut_rates(int len_orig, int len_mut, int 
     cout << "D: " << D << endl;
     
 
-    double subst_rate = 3.0 / (L - 4.0 * fA) * (4.0 * S * fA_mut / (4.0*S + 3.0*D) 
-                        - L2 * S / (4.0*S + 3.0*D) ) 
-                        + 3.0 * S / (4*S + 3*D);
+    double subst_rate = 3.0 * (fA_mut - fA + 1.0*L/4 - 1.0*L2/4) / (  (L-4*fA) * (1 + 3*D/(4*S))  );
     
     double del_rate = 1.0 * D * subst_rate / S;
 
