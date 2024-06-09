@@ -207,6 +207,52 @@ int main(int argc, char* argv[]) {
     cout << "Insertion rate: " << ins_rate << endl;
     cout << "Deletion rate: " << del_rate << endl;
 
+    // read the first line of genome2
+    string genome2_first_line;
+    ifstream file(genome2_filename);
+    getline(file, genome2_first_line);
+
+    // format of this line: "> mutated_13110_11715_12488_60639"
+    // extract the numbers from this line
+    stringstream ss(genome2_first_line);
+    string token;
+    vector<int> numbers;
+    bool first = true;
+    while (getline(ss, token, '_')) {
+        if (first) {
+            first = false;
+            continue;
+        }
+        numbers.push_back(stoi(token));
+    }
+
+    cout << "Using the true values...." << endl;
+
+    // print these numbers
+    for (int num : numbers) {
+        cout << num << " ";
+    }
+
+    cout << endl;
+
+    // S, D, I, N_sh = these numbers
+    int S = numbers[0];
+    int D = numbers[1];
+    int I = numbers[2];
+    int N_sh = numbers[3];
+
+    // calculate the rate using these
+    tuple<double, double, double> rates = estimate_mut_rates(str_orig.size(), str_mut.size(), S, D, count(str_orig.begin(), str_orig.end(), 'A'), count(str_mut.begin(), str_mut.end(), 'A'));
+
+    // extract the rates
+    double subst_rate = get<0>(rates);
+    double ins_rate = get<1>(rates);
+    double del_rate = get<2>(rates);
+
+    // print the rates
+    cout << "Substitution rate: " << subst_rate << endl;
+    cout << "Insertion rate: " << ins_rate << endl;
+    cout << "Deletion rate: " << del_rate << endl;
 
     return 0;
 }
