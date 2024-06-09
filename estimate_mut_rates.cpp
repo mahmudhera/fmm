@@ -245,9 +245,9 @@ int main(int argc, char* argv[]) {
     tuple<double, double, double> rates = estimate_mut_rates(str_orig.size(), str_mut.size(), S, D, count(str_orig.begin(), str_orig.end(), 'A'), count(str_mut.begin(), str_mut.end(), 'A'));
 
     // extract the rates
-    double subst_rate = get<0>(rates);
-    double ins_rate = get<1>(rates);
-    double del_rate = get<2>(rates);
+    subst_rate = get<0>(rates);
+    ins_rate = get<1>(rates);
+    del_rate = get<2>(rates);
 
     // print the rates
     cout << "Substitution rate: " << subst_rate << endl;
