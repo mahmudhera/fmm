@@ -242,7 +242,7 @@ int main(int argc, char* argv[]) {
     int N_sh = numbers[3];
 
     // calculate the rate using these
-    tuple<double, double, double> rates = estimate_mut_rates(str_orig.size(), str_mut.size(), S, D, count(str_orig.begin(), str_orig.end(), 'A'), count(str_mut.begin(), str_mut.end(), 'A'));
+    rates = estimate_mut_rates(str_orig.size(), str_mut.size(), S, D, count(str_orig.begin(), str_orig.end(), 'A'), count(str_mut.begin(), str_mut.end(), 'A'));
 
     // extract the rates
     subst_rate = get<0>(rates);
