@@ -139,12 +139,12 @@ pair<int, int> estimate_single_sub_del(vector<string> kmers_orig, vector<string>
 // substitution rate, insertion rate, and deletion rate
 tuple<double, double, double> estimate_mut_rates(int len_orig, int len_mut, int num_kmer_single_subst, int num_kmer_single_del, int num_A_orig, int num_A_mut) {
     
-    int L = len_orig;
-    int L2 = len_mut;
-    int fA = num_A_orig;
-    int fA_mut = num_A_mut;
-    int S = num_kmer_single_subst;
-    int D = num_kmer_single_del;
+    double L = len_orig;
+    double L2 = len_mut;
+    double fA = num_A_orig;
+    double fA_mut = num_A_mut;
+    double S = num_kmer_single_subst;
+    double D = num_kmer_single_del;
 
     // print all these values
     cout << "L: " << L << endl;
