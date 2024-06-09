@@ -161,14 +161,14 @@ tuple<double, double, double> estimate_mut_rates(int len_orig, int len_mut, int 
 
     cout << val1 << " " << val2 << endl;
 
-    assert(val1 == val2);
+    assert(abs(val1 - val2) < 1e-6);
 
     val1 = 3.0 * (- fA + 1.0*L/4) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  );
     val2 = 3.0 * S / (4.0*S + 3.0*D);
 
     cout << val1 << " " << val2 << endl;
 
-    assert(val1 == val2);
+    assert(abs(val1 - val2) < 1e-6);
 
     val1 = 3.0 * (fA_mut - fA + 1.0*L/4 - 1.0*L2/4) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  );
     val2 = 3.0 * (4.0 * S * fA_mut / (4.0*S + 3.0*D) - L2 * S / (4.0*S + 3.0*D) ) / (L - 4.0 * fA) 
