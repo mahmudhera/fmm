@@ -108,13 +108,62 @@ pair<int, int> estimate_single_sub_del(vector<string> kmers_orig, vector<string>
     }
 
 
-    // placeholder
-    num_kmer_single_del = -1;
+    // iterate over all k+1 mers in the original genome
+    for (string kplusone_mer : kplusone_mers_orig) {
+        
+        // generate all kmers that are 1 del away from the original k+1 mer
+        for (int i = 0; i < kplusone_mer.size(); i++) {
+            string kmer_del = kplusone_mer.substr(0, i) + kplusone_mer.substr(i + 1);
+
+            // if kmer_del in kmers_orig_set, then continue
+            if (kmers_orig_set.find(kmer_del) != kmers_orig_set.end()) {
+                continue;
+            }
+
+            // if kmer_del in kmers_mut_set, then increment num_kmer_single_del
+            if (kmers_mut_set.find(kmer_del) != kmers_mut_set.end()) {
+                num_kmer_single_del++;
+            }
+
+        }
+
+    }
 
     return make_pair(num_kmer_single_subst, num_kmer_single_del);  
         
 }
 
+
+// function to estimate the mutation rates, returns three doubles
+// substitution rate, insertion rate, and deletion rate
+tuple<double, double, double> estimate_mut_rates(int len_orig, int len_mut, int num_kmer_single_subst, int num_kmer_single_del, int num_A_orig, int num_A_mut) {
+    
+    int L = len_orig;
+    int L2 = len_mut;
+    int fA = num_A_orig;
+    int fA_mut = num_A_mut;
+    int S = num_kmer_single_subst;
+    int D = num_kmer_single_del;
+
+    // print all these values
+    cout << "L: " << L << endl;
+    cout << "L2: " << L2 << endl;
+    cout << "fA: " << fA << endl;
+    cout << "fA_mut: " << fA_mut << endl;
+    cout << "S: " << S << endl;
+    cout << "D: " << D << endl;
+    
+
+    double subst_rate = 3.0 / (L - 4.0 * fA) * (4.0 * S * fA_mut / (4.0*S + 3.0*D) 
+                        - L2 * S / (4.0*S + 3.0*D) ) 
+                        + 3.0 * S / (4*S + 3*D);
+    
+    double del_rate = 1.0 * D * subst_rate / S;
+
+    double ins_rate = 1.0 * L2 / L - 1.0 + del_rate;
+
+    return make_tuple(subst_rate, ins_rate, del_rate);
+}
 
 
 // main function
@@ -141,10 +190,23 @@ int main(int argc, char* argv[]) {
     // estimate the number of kmers with single substitution and deletion
     pair<int, int> estimates = estimate_single_sub_del(kmers_orig, kplusone_mers_orig, kmers_mut);
 
-    // write the estimates to the output file
-    ofstream output_file(output_filename);
-    output_file << estimates.first << " " << estimates.second << endl;
-    output_file.close();
+    // extract them to variables
+    int num_kmer_single_subst = estimates.first;
+    int num_kmer_single_del = estimates.second;
+
+    // calculate the mutation rates
+    tuple<double, double, double> rates = estimate_mut_rates(str_orig.size(), str_mut.size(), num_kmer_single_subst, num_kmer_single_del, count(str_orig.begin(), str_orig.end(), 'A'), count(str_mut.begin(), str_mut.end(), 'A'));
+
+    // extract the rates
+    double subst_rate = get<0>(rates);
+    double ins_rate = get<1>(rates);
+    double del_rate = get<2>(rates);
+
+    // print the rates
+    cout << "Substitution rate: " << subst_rate << endl;
+    cout << "Insertion rate: " << ins_rate << endl;
+    cout << "Deletion rate: " << del_rate << endl;
+
 
     return 0;
 }
