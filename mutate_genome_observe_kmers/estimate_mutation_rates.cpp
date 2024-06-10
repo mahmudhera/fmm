@@ -273,6 +273,7 @@ int main(int argc, char* argv[]) {
             for (double del_rate : mutation_rates) {
                 for (double ins_rate : mutation_rates) {
                     string filename = "mutated_" + to_string(i) + "_" + to_string(subst_rate) + "_" + to_string(del_rate) + "_" + to_string(ins_rate) + "_" + to_string(k) + ".fasta";
+                    cout << filename << endl;
                     tuple<double, double, double> rates_by_known_values = estimate_rates_for_pair_of_files_by_known_values(genome_filename, filename, k);
                     tuple<double, double, double> rates_by_kmers = estimate_rates_for_pair_of_files_by_kmers(genome_filename, filename, k);
                     // print: p_s, p_d, p_i, p_s_est1, p_d_est1, p_i_est1, p_s_est2, p_d_est2, p_i_est2
