@@ -146,14 +146,6 @@ tuple<double, double, double> estimate_mut_rates(int len_orig, int len_mut, int 
     double S = num_kmer_single_subst;
     double D = num_kmer_single_del;
 
-    // print all these values
-    cout << "L: " << L << endl;
-    cout << "L2: " << L2 << endl;
-    cout << "fA: " << fA << endl;
-    cout << "fA_mut: " << fA_mut << endl;
-    cout << "S: " << S << endl;
-    cout << "D: " << D << endl;
-
     double val1, val2;
 
     val1 = 3.0 * (fA_mut - 1.0*L2/4.0) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  );
