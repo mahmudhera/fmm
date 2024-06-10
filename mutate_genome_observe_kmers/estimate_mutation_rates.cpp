@@ -150,25 +150,15 @@ tuple<double, double, double> estimate_mut_rates(int len_orig, int len_mut, int 
 
     val1 = 3.0 * (fA_mut - 1.0*L2/4.0) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  );
     val2 = 3.0 * (4.0 * S * fA_mut / (4.0*S + 3.0*D) - L2 * S / (4.0*S + 3.0*D) ) / (L - 4.0 * fA);
-
-    cout << val1 << " " << val2 << endl;
-
     assert(abs(val1 - val2) < 1e-6);
 
     val1 = 3.0 * (- fA + 1.0*L/4) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  );
     val2 = 3.0 * S / (4.0*S + 3.0*D);
-
-    cout << val1 << " " << val2 << endl;
-
     assert(abs(val1 - val2) < 1e-6);
 
     val1 = 3.0 * (fA_mut - fA + 1.0*L/4 - 1.0*L2/4) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  );
     val2 = 3.0 * (4.0 * S * fA_mut / (4.0*S + 3.0*D) - L2 * S / (4.0*S + 3.0*D) ) / (L - 4.0 * fA) 
                         + 3.0 * S / (4.0*S + 3.0*D);
-
-    cout << val1 << " " << val2 << endl;
-    
-    // assert that the two values are equal up to 1e-6
     assert(abs(val1 - val2) < 1e-6);
     
 
@@ -261,10 +251,11 @@ int main(int argc, char* argv[]) {
     // create a vector of mutation rates, keeping the rates as strings
     vector<string> mutation_rates = {"0.01", "0.05", "0.1"};
 
-    for (int i = 0; i < num_files; i++) {
-        for (string subst_rate : mutation_rates) {
-            for (string del_rate : mutation_rates) {
-                for (string ins_rate : mutation_rates) {
+    
+    for (string subst_rate : mutation_rates) {
+        for (string del_rate : mutation_rates) {
+            for (string ins_rate : mutation_rates) {
+                for (int i = 0; i < num_files; i++) {
                     // use two decimal places for the rates
                     string filename = genome_filename + "_mutated_" + subst_rate + "_" + del_rate + "_" + ins_rate + "_" + to_string(k) + "_" + to_string(i) + ".fasta";
                     cout << filename << endl;
