@@ -274,7 +274,7 @@ int main(int argc, char* argv[]) {
             for (string del_rate : mutation_rates) {
                 for (string ins_rate : mutation_rates) {
                     // use two decimal places for the rates
-                    string filename = "mutated_" + subst_rate + "_" + del_rate + "_" + ins_rate + "_" + to_string(k) + "_" + to_string(i) + ".fasta";
+                    string filename = genome_filename + "mutated_" + subst_rate + "_" + del_rate + "_" + ins_rate + "_" + to_string(k) + "_" + to_string(i) + ".fasta";
                     cout << filename << endl;
                     tuple<double, double, double> rates_by_known_values = estimate_rates_for_pair_of_files_by_known_values(genome_filename, filename, k);
                     tuple<double, double, double> rates_by_kmers = estimate_rates_for_pair_of_files_by_kmers(genome_filename, filename, k);
