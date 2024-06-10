@@ -70,9 +70,9 @@ vector<string> get_kmers(string seq, int k) {
 
 // Function that estimates number of kmers with single substitution and deletion
 // returns both estimates
-pair<int, int> estimate_single_sub_del(vector<string> kmers_orig, vector<string> kplusone_mers_orig, vector<string> kmers_mut) {
-    int num_kmer_single_subst = 0;
-    int num_kmer_single_del = 0;
+pair<uint64_t, uint64_t> estimate_single_sub_del(vector<string> kmers_orig, vector<string> kplusone_mers_orig, vector<string> kmers_mut) {
+    uint64_t num_kmer_single_subst = 0;
+    uint64_t num_kmer_single_del = 0;
 
     char bases[] = {'A', 'C', 'G', 'T'};
 
@@ -214,11 +214,11 @@ int main(int argc, char* argv[]) {
     vector<string> kplusone_mers_orig = get_kmers(str_orig, 22);
 
     // estimate the number of kmers with single substitution and deletion
-    pair<int, int> estimates = estimate_single_sub_del(kmers_orig, kplusone_mers_orig, kmers_mut);
+    pair<uint64_t, uint64_t> estimates = estimate_single_sub_del(kmers_orig, kplusone_mers_orig, kmers_mut);
 
     // extract them to variables
-    int num_kmer_single_subst = estimates.first;
-    int num_kmer_single_del = estimates.second;
+    uint64_t num_kmer_single_subst = estimates.first;
+    uint64_t num_kmer_single_del = estimates.second;
 
     // calculate the mutation rates
     tuple<double, double, double> rates = estimate_mut_rates(str_orig.size(), str_mut.size(), num_kmer_single_subst, num_kmer_single_del, count(str_orig.begin(), str_orig.end(), 'A'), count(str_mut.begin(), str_mut.end(), 'A'));
