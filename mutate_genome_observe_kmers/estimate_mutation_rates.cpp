@@ -266,13 +266,15 @@ int main(int argc, char* argv[]) {
     int num_files = stoi(argv[2]);
     int k = stoi(argv[3]);
 
-    double mutation_rates[] = {0.01, 0.05, 0.1};
+    // create a vector of mutation rates, keeping the rates as strings
+    vector<string> mutation_rates = {"0.01", "0.05", "0.1"};
 
     for (int i = 0; i < num_files; i++) {
-        for (double subst_rate : mutation_rates) {
-            for (double del_rate : mutation_rates) {
-                for (double ins_rate : mutation_rates) {
-                    string filename = "mutated_" + to_string(i) + "_" + to_string(subst_rate) + "_" + to_string(del_rate) + "_" + to_string(ins_rate) + "_" + to_string(k) + ".fasta";
+        for (string subst_rate : mutation_rates) {
+            for (string del_rate : mutation_rates) {
+                for (string ins_rate : mutation_rates) {
+                    // use two decimal places for the rates
+                    string filename = "mutated_" + subst_rate + "_" + del_rate + "_" + ins_rate + "_" + to_string(k) + "_" + to_string(i) + ".fasta";
                     cout << filename << endl;
                     tuple<double, double, double> rates_by_known_values = estimate_rates_for_pair_of_files_by_known_values(genome_filename, filename, k);
                     tuple<double, double, double> rates_by_kmers = estimate_rates_for_pair_of_files_by_kmers(genome_filename, filename, k);
