@@ -102,6 +102,23 @@ def assign_colors_to_unitigs(unitigs, kmers_shared_set, kmers_only_in_orig, kmer
     return colors, unitigs_in_both, unitigs_in_orig, unitigs_in_mutated
 
 
+def find_bridging_unitigs(unitigs_in_orig, unitigs_in_mutated, graph, children, parent):
+    bridging_unitig_pairs = []
+    for unitig_orig in unitigs_in_orig:
+        for unitig_mutated in unitigs_in_mutated:
+            try:
+                unitig_orig_parents = parent[unitig_orig]
+                unitig_mutated_parents = parent[unitig_mutated]
+                unitig_orig_children = children[unitig_orig]
+                unitig_mutated_children = children[unitig_mutated]
+
+                if len(set(unitig_orig_parents).intersection(set(unitig_mutated_parents))) > 0 and len(set(unitig_mutated_children).intersection(set(unitig_orig_children))) > 0:
+                    bridging_unitig_pairs.append((unitig_orig, unitig_mutated))
+            except KeyError:
+                continue
+    return bridging_unitig_pairs
+
+
 def main():
     unitigs_file = 'cdbg.fa'
     orig_sequence_filename = 'ndl_orig.fasta'
@@ -152,6 +169,15 @@ def main():
     # show five random graph entries
     for i in range(5):
         print(list(graph.keys())[i], graph[list(graph.keys())[i]])
+
+    tick = time.time()
+    bridging_unitig_pairs = find_bridging_unitigs(unitigs_in_orig, unitigs_in_mutated, graph, children, parent)
+    print('Time to find bridging unitigs:', time.time() - tick)
+    print('Number of bridging unitig pairs:', len(bridging_unitig_pairs))
+    # show first five bridging unitig pairs
+    print('Some sample bridging unitig pairs:')
+    for i in range(5):
+        print(bridging_unitig_pairs[i])
 
 
 if __name__ == '__main__':
