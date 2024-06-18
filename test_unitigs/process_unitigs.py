@@ -75,6 +75,21 @@ def build_de_bruijn_graph(unitigs, k=21):
     return graph, children, parent
 
 
+def assign_colors_to_unitigs(unitigs, kmers_shared_set, kmers_only_in_orig, kmers_only_in_mutated, k):
+    colors = {}
+    for unitig in unitigs:
+        unitig_one_kmet = unitig[:k]
+        if unitig_one_kmet in kmers_shared_set:
+            colors[unitig] = 'both'
+        elif unitig_one_kmet in kmers_only_in_orig:
+            colors[unitig] = 'orig'
+        elif unitig_one_kmet in kmers_only_in_mutated:
+            colors[unitig] = 'mutated'
+        else:
+            colors[unitig] = 'none'
+    return colors
+
+
 def main():
     unitigs_file = 'cdbg.fa'
     orig_sequence_filename = 'ndl_orig.fasta'
@@ -93,12 +108,21 @@ def main():
     kmers_only_in_orig = set(kmers_orig).difference(set(kmers_mutated))
     kmers_only_in_mutated = set(kmers_mutated).difference(set(kmers_orig))
 
+    
     tock = time.time()
     print('Time to process genome files:', tock - tick)
     
     tick = time.time()
     unitigs = read_unitigs(unitigs_file)
     print('Time to read unitigs:', time.time() - tick)
+
+    tick = time.time()
+    colors = assign_colors_to_unitigs(unitigs, kmers_shared_set, kmers_only_in_orig, kmers_only_in_mutated, k)
+    print('Time to assign colors:', time.time() - tick)
+    # show five random unitigs
+    print('Some sample colors:')
+    for i in range(5):
+        print(list(unitigs)[i], colors[list(unitigs)[i]])
 
     tick = time.time()
     graph, children, parent = build_de_bruijn_graph(unitigs)
