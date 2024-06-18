@@ -1,10 +1,15 @@
 import time
 from Bio import SeqIO
 
-"""
-This script takes the following arguments:
-    - genome_file: the path to the genome file
-"""
+alphabet = set('ACGT')
+
+def reverse_complement(kmer):
+    """
+    Returns the reverse complement of a k-mer
+    """
+    complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
+    return ''.join(complement[base] for base in reversed(kmer))
+
 
 def read_genome(genome_file):
     """
@@ -78,12 +83,13 @@ def build_de_bruijn_graph(unitigs, k=21):
 def assign_colors_to_unitigs(unitigs, kmers_shared_set, kmers_only_in_orig, kmers_only_in_mutated, k):
     colors = {}
     for unitig in unitigs:
+        revcomp_unitig = reverse_complement(unitig)
         unitig_one_kmet = unitig[:k]
-        if unitig_one_kmet in kmers_shared_set:
+        if unitig_one_kmet in kmers_shared_set or revcomp_unitig in kmers_shared_set
             colors[unitig] = 'both'
-        elif unitig_one_kmet in kmers_only_in_orig:
+        elif unitig_one_kmet in kmers_only_in_orig or revcomp_unitig in kmers_only_in_orig:
             colors[unitig] = 'orig'
-        elif unitig_one_kmet in kmers_only_in_mutated:
+        elif unitig_one_kmet in kmers_only_in_mutated or revcomp_unitig in kmers_only_in_mutated:
             colors[unitig] = 'mutated'
         else:
             colors[unitig] = 'none'
