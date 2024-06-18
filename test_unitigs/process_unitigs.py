@@ -109,6 +109,10 @@ def main():
     print('Number of children:', sum([len(children[u]) for u in children]))
     print('Number of parents:', sum([len(parent[u]) for u in parent]))
 
+    # show five random graph entries
+    for i in range(5):
+        print(list(graph.keys())[i], graph[list(graph.keys())[i]])
+
 
 if __name__ == '__main__':
     main()
