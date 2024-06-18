@@ -83,13 +83,13 @@ def build_de_bruijn_graph(unitigs, k=21):
 def assign_colors_to_unitigs(unitigs, kmers_shared_set, kmers_only_in_orig, kmers_only_in_mutated, k):
     colors = {}
     for unitig in unitigs:
-        revcomp_unitig = reverse_complement(unitig)
         unitig_one_kmet = unitig[:k]
-        if unitig_one_kmet in kmers_shared_set or revcomp_unitig in kmers_shared_set:
+        revcomp_kmer = reverse_complement(unitig_one_kmet)
+        if unitig_one_kmet in kmers_shared_set or revcomp_kmer in kmers_shared_set:
             colors[unitig] = 'both'
-        elif unitig_one_kmet in kmers_only_in_orig or revcomp_unitig in kmers_only_in_orig:
+        elif unitig_one_kmet in kmers_only_in_orig or revcomp_kmer in kmers_only_in_orig:
             colors[unitig] = 'orig'
-        elif unitig_one_kmet in kmers_only_in_mutated or revcomp_unitig in kmers_only_in_mutated:
+        elif unitig_one_kmet in kmers_only_in_mutated or revcomp_kmer in kmers_only_in_mutated:
             colors[unitig] = 'mutated'
         else:
             colors[unitig] = 'none'
