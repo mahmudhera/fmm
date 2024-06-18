@@ -225,6 +225,13 @@ def main():
     for i in range(5):
         print(bridging_unitig_pairs[i])
 
+    tick = time.time()
+    num_single_subst, num_single_delt, num_single_insert = count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k)
+    print('Time to count single subst/delt/insert:', time.time() - tick)
+    print('Number of single substitutions:', num_single_subst)
+    print('Number of single deletions:', num_single_delt)
+    print('Number of single insertions:', num_single_insert)
+
 
 if __name__ == '__main__':
     main()
