@@ -85,7 +85,7 @@ def assign_colors_to_unitigs(unitigs, kmers_shared_set, kmers_only_in_orig, kmer
     for unitig in unitigs:
         revcomp_unitig = reverse_complement(unitig)
         unitig_one_kmet = unitig[:k]
-        if unitig_one_kmet in kmers_shared_set or revcomp_unitig in kmers_shared_set
+        if unitig_one_kmet in kmers_shared_set or revcomp_unitig in kmers_shared_set:
             colors[unitig] = 'both'
         elif unitig_one_kmet in kmers_only_in_orig or revcomp_unitig in kmers_only_in_orig:
             colors[unitig] = 'orig'
