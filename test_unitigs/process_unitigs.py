@@ -15,10 +15,12 @@ def build_de_bruijn_graph(unitigs, k=21):
     children = {}
     parent = {}
 
+    unitigs_list = list(unitigs)
+
     for i in range(len(unitigs)):
-        unitig1 = unitigs[i]
+        unitig1 = unitigs_list[i]
         for j in range(i+1, len(unitigs)):
-            unitig2 = unitigs[j]
+            unitig2 = unitigs_list[j]
             if unitig1[-k+1:] == unitig2[:k-1]:
                 if unitig1 not in graph:
                     graph[unitig1] = []
