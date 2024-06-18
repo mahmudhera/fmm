@@ -1,5 +1,7 @@
 import time
 from Bio import SeqIO
+from Bio import pairwise2
+from Bio.pairwise2 import format_alignment
 
 alphabet = set('ACGT')
 
@@ -117,6 +119,50 @@ def find_bridging_unitigs(unitigs_in_orig, unitigs_in_mutated, graph, children, 
             except KeyError:
                 continue
     return bridging_unitig_pairs
+
+
+def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k):
+    num_single_subst = 0
+    num_single_delt = 0
+    num_single_insert = 0
+
+    for unitig_orig, unitig_mutated in bridging_unitig_pairs:
+        alignment = pairwise2.align.globalms(unitig_orig, unitig_mutated, 1, -1, -1, -1)
+        lines = format_alignment(*alignment[0]).split('\n')
+        num_chars = len(lines[1])
+        in_numbers = [0 for i in range(num_chars)]
+        for i in range(num_chars):
+            if lines[1][i] == '.':
+                in_numbers[i] = 1
+
+        for i in range(num_chars-k+1):
+            if sum(in_numbers[i:i+k]) == 1:
+                num_single_subst += 1
+
+        in_numbers = [0 for i in range(num_chars)]
+        for i in range(num_chars):
+            if lines[1][i] == ' ' and lines[0][i] == '-':
+                in_numbers[i] = 1
+
+        for i in range(num_chars-k+1):
+            if sum(in_numbers[i:i+k]) == 1:
+                num_single_insert += 1
+
+        in_numbers = [0 for i in range(num_chars)]
+        for i in range(num_chars):
+            if lines[1][i] == ' ' and lines[0][i] != '-':
+                in_numbers[i] = 1
+
+        for i in range(num_chars-k+1):
+            if sum(in_numbers[i:i+k]) == 1:
+                num_single_delt += 1
+
+    return num_single_subst, num_single_delt, num_single_insert
+
+        
+        
+            
+                
 
 
 def main():
