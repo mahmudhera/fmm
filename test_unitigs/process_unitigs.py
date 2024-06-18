@@ -1,4 +1,35 @@
 import time
+from Bio import SeqIO
+
+"""
+This script takes the following arguments:
+    - genome_file: the path to the genome file
+"""
+
+def read_genome(genome_file):
+    """
+    Reads a genome file and returns the genome as a string
+    """
+    genome = ""
+    for record in SeqIO.parse(genome_file, "fasta"):
+        genome += str(record.seq)
+    return genome
+
+def clean_genome_string(genome_string):
+    """
+    Removes all non-alphabet characters from a genome string
+    """
+    alphabet = set('ACGT')
+    return ''.join(filter(alphabet.__contains__, genome_string))
+                   
+def get_kmers(genome_string, k):
+    """
+    Returns a list of all k-mers in a genome string
+    """
+    kmers = []
+    for i in range(len(genome_string)-k+1):
+        kmers.append(genome_string[i:i+k])
+    return kmers
 
 def read_unitigs(unitigs_file):
     unitigs = set()
@@ -46,6 +77,24 @@ def build_de_bruijn_graph(unitigs, k=21):
 
 def main():
     unitigs_file = 'cdbg.fa'
+    orig_sequence_filename = 'ndl_orig.fasta'
+    mutated_sequence_filename = 'ndl_mutated.fasta'
+    k = 21
+
+    tick = time.time()
+
+    orig_genome = clean_genome_string(read_genome(orig_sequence_filename))
+    mutated_genome = clean_genome_string(read_genome(mutated_sequence_filename))
+
+    kmers_orig = get_kmers(orig_genome, k)
+    kmers_mutated = get_kmers(mutated_genome, k)
+
+    kmers_shared_set = set(kmers_orig).intersection(set(kmers_mutated))
+    kmers_only_in_orig = set(kmers_orig).difference(set(kmers_mutated))
+    kmers_only_in_mutated = set(kmers_mutated).difference(set(kmers_orig))
+
+    tock = time.time()
+    print('Time to process genome files:', tock - tick)
     
     tick = time.time()
     unitigs = read_unitigs(unitigs_file)
