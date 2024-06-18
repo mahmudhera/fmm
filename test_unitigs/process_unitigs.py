@@ -57,4 +57,7 @@ def main():
     print('Number of edges:', sum([len(graph[u]) for u in graph]))
     print('Number of children:', sum([len(children[u]) for u in children]))
     print('Number of parents:', sum([len(parent[u]) for u in parent]))
-    
+
+
+if __name__ == '__main__':
+    main()
