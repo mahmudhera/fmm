@@ -82,18 +82,24 @@ def build_de_bruijn_graph(unitigs, k=21):
 
 def assign_colors_to_unitigs(unitigs, kmers_shared_set, kmers_only_in_orig, kmers_only_in_mutated, k):
     colors = {}
+    unitigs_in_both = []
+    unitigs_in_orig = []
+    unitigs_in_mutated = []
     for unitig in unitigs:
         unitig_one_kmet = unitig[:k]
         revcomp_kmer = reverse_complement(unitig_one_kmet)
         if unitig_one_kmet in kmers_shared_set or revcomp_kmer in kmers_shared_set:
             colors[unitig] = 'both'
+            unitigs_in_both.append(unitig)
         elif unitig_one_kmet in kmers_only_in_orig or revcomp_kmer in kmers_only_in_orig:
             colors[unitig] = 'orig'
+            unitigs_in_orig.append(unitig)
         elif unitig_one_kmet in kmers_only_in_mutated or revcomp_kmer in kmers_only_in_mutated:
             colors[unitig] = 'mutated'
+            unitigs_in_mutated.append(unitig)
         else:
             colors[unitig] = 'none'
-    return colors
+    return colors, unitigs_in_both, unitigs_in_orig, unitigs_in_mutated
 
 
 def main():
@@ -123,12 +129,16 @@ def main():
     print('Time to read unitigs:', time.time() - tick)
 
     tick = time.time()
-    colors = assign_colors_to_unitigs(unitigs, kmers_shared_set, kmers_only_in_orig, kmers_only_in_mutated, k)
+    colors, unitigs_in_both, unitigs_in_orig, unitigs_in_mutated = assign_colors_to_unitigs(unitigs, kmers_shared_set, kmers_only_in_orig, kmers_only_in_mutated, k)
     print('Time to assign colors:', time.time() - tick)
     # show five random unitigs
     print('Some sample colors:')
     for i in range(5):
         print(list(unitigs)[i], colors[list(unitigs)[i]])
+
+    print('Number of unitigs in both:', len(unitigs_in_both))
+    print('Number of unitigs in orig only:', len(unitigs_in_orig))
+    print('Number of unitigs in mutated only:', len(unitigs_in_mutated))
 
     tick = time.time()
     graph, children, parent = build_de_bruijn_graph(unitigs)
