@@ -126,14 +126,25 @@ def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k):
     num_single_delt = 0
     num_single_insert = 0
 
+    alphabel = set('ACGT')
+
     for unitig_orig, unitig_mutated in bridging_unitig_pairs:
-        alignment = pairwise2.align.globalms(unitig_orig, unitig_mutated, 1, -1, -1, -1)
-        lines = format_alignment(*alignment[0]).split('\n')
-        num_chars = len(lines[1])
+        alignment1 = pairwise2.align.globalms(unitig_orig, unitig_mutated, 1, -1, -1, -1)[0]
+        alignment2 = pairwise2.align.globalms(unitig_orig, reverse_complement(unitig_mutated), 1, -1, -1, -1)[0]
+
+        if alignment1.score > alignment2.score:
+            alignment = alignment1
+        else:
+            alignment = alignment2
+
+        seqA = alignment.seqA
+        seqB = alignment.seqB
+        num_chars = len(seqA)
         in_numbers = [0 for i in range(num_chars)]
         for i in range(num_chars):
-            if lines[1][i] == '.':
-                in_numbers[i] = 1
+            if seqA[i] != seqB[i]:
+                if seqA[i] in alphabet and seqB[i] in alphabet:
+                    in_numbers[i] = 1
 
         for i in range(num_chars-k+1):
             if sum(in_numbers[i:i+k]) == 1:
@@ -141,8 +152,9 @@ def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k):
 
         in_numbers = [0 for i in range(num_chars)]
         for i in range(num_chars):
-            if lines[1][i] == ' ' and lines[0][i] == '-':
-                in_numbers[i] = 1
+            if seqA[i] != seqB[i]:
+                if seqA[i] == '-':
+                    in_numbers[i] = 1
 
         for i in range(num_chars-k+1):
             if sum(in_numbers[i:i+k]) == 1:
@@ -150,8 +162,9 @@ def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k):
 
         in_numbers = [0 for i in range(num_chars)]
         for i in range(num_chars):
-            if lines[1][i] == ' ' and lines[0][i] != '-':
-                in_numbers[i] = 1
+            if seqA[i] != seqB[i]:
+                if seqB[i] == '-':
+                    in_numbers[i] = 1
 
         for i in range(num_chars-k+1):
             if sum(in_numbers[i:i+k]) == 1:
@@ -162,9 +175,7 @@ def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k):
         
         
             
-                
-
-
+            
 def main():
     unitigs_file = 'cdbg.fa'
     orig_sequence_filename = 'ndl_orig.fasta'
