@@ -121,7 +121,7 @@ def find_bridging_unitigs(unitigs_in_orig, unitigs_in_mutated, graph, children, 
     return bridging_unitig_pairs
 
 
-def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k):
+def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k, kmers_orig_count):
     num_single_subst = 0
     num_single_delt = 0
     num_single_insert = 0
@@ -148,7 +148,8 @@ def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k):
 
         for i in range(num_chars-k+1):
             if sum(in_numbers[i:i+k]) == 1:
-                num_single_subst += 1
+                kmer_of_interest = seqA[i:i+k]
+                num_single_subst += kmers_orig_count[kmer_of_interest]
 
         in_numbers = [0 for i in range(num_chars)]
         for i in range(num_chars):
@@ -158,7 +159,8 @@ def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k):
 
         for i in range(num_chars-k+1):
             if sum(in_numbers[i:i+k]) == 1:
-                num_single_insert += 1
+                kmer_of_interest = seqB[i:i+k]
+                num_single_insert += kmers_orig_count[kmer_of_interest]
 
         in_numbers = [0 for i in range(num_chars)]
         for i in range(num_chars):
@@ -168,7 +170,8 @@ def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k):
 
         for i in range(num_chars-k+1):
             if sum(in_numbers[i:i+k]) == 1:
-                num_single_delt += 1
+                kmer_of_interest = seqA[i:i+k]
+                num_single_delt += kmers_orig_count[kmer_of_interest]
 
     return num_single_subst, num_single_delt, num_single_insert
 
@@ -236,8 +239,16 @@ def main():
     for i in range(5):
         print(bridging_unitig_pairs[i])
 
+    # get count of kmers in kmers_orig
+    kmers_orig_count = {}
+    for kmer in kmers_orig:
+        if kmer in kmers_orig_count:
+            kmers_orig_count[kmer] += 1
+        else:
+            kmers_orig_count[kmer] = 1
+
     tick = time.time()
-    num_single_subst, num_single_delt, num_single_insert = count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k)
+    num_single_subst, num_single_delt, num_single_insert = count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k, kmers_orig_count)
     print('Time to count single subst/delt/insert:', time.time() - tick)
     print('Number of single substitutions:', num_single_subst)
     print('Number of single deletions:', num_single_delt)
