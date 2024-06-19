@@ -129,8 +129,8 @@ def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k):
     alphabel = set('ACGT')
 
     for unitig_orig, unitig_mutated in bridging_unitig_pairs:
-        alignment1 = pairwise2.align.globalms(unitig_orig, unitig_mutated, 1, -1, -1, -1)[0]
-        alignment2 = pairwise2.align.globalms(unitig_orig, reverse_complement(unitig_mutated), 1, -1, -1, -1)[0]
+        alignment1 = pairwise2.align.globalms(unitig_orig, unitig_mutated, 3, -1, -1, -1)[0]
+        alignment2 = pairwise2.align.globalms(unitig_orig, reverse_complement(unitig_mutated), 3, -1, -1, -1)[0]
 
         if alignment1.score > alignment2.score:
             alignment = alignment1
