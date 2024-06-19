@@ -139,6 +139,7 @@ def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k, kmers_orig_co
 
         seqA = alignment.seqA
         seqB = alignment.seqB
+        
         num_chars = len(seqA)
         in_numbers = [0 for i in range(num_chars)]
         for i in range(num_chars):
@@ -148,7 +149,7 @@ def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k, kmers_orig_co
 
         for i in range(num_chars-k+1):
             if sum(in_numbers[i:i+k]) == 1:
-                kmer_of_interest = seqA[i:i+k]
+                kmer_of_interest = seqA[i:].replace('-', '')[:k]
                 if kmer_of_interest in kmers_orig_count:
                     num_single_subst += kmers_orig_count[kmer_of_interest]
                 else:
@@ -156,11 +157,7 @@ def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k, kmers_orig_co
                         kmer_of_interest = reverse_complement(kmer_of_interest)
                         num_single_subst += kmers_orig_count[kmer_of_interest]
                     except:
-                        print(seqA)
-                        print(seqB)
-                        print(kmer_of_interest)
-                        print(i)
-                        exit(-1)
+                        print('Error:', kmer_of_interest)
 
         in_numbers = [0 for i in range(num_chars)]
         for i in range(num_chars):
@@ -170,12 +167,15 @@ def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k, kmers_orig_co
 
         for i in range(num_chars-k+1):
             if sum(in_numbers[i:i+k]) == 1:
-                kmer_of_interest = seqB[i:i+k]
+                kmer_of_interest = seqA[i:].replace('-', '')[:k]
                 if kmer_of_interest in kmers_orig_count:
                     num_single_subst += kmers_orig_count[kmer_of_interest]
                 else:
-                    kmer_of_interest = reverse_complement(kmer_of_interest)
-                    num_single_subst += kmers_orig_count[kmer_of_interest]
+                    try:
+                        kmer_of_interest = reverse_complement(kmer_of_interest)
+                        num_single_subst += kmers_orig_count[kmer_of_interest]
+                    except:
+                        print('Error:', kmer_of_interest)
 
         in_numbers = [0 for i in range(num_chars)]
         for i in range(num_chars):
@@ -185,12 +185,15 @@ def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k, kmers_orig_co
 
         for i in range(num_chars-k+1):
             if sum(in_numbers[i:i+k]) == 1:
-                kmer_of_interest = seqA[i:i+k]
+                kmer_of_interest = seqA[i:].replace('-', '')[:k]
                 if kmer_of_interest in kmers_orig_count:
                     num_single_subst += kmers_orig_count[kmer_of_interest]
                 else:
-                    kmer_of_interest = reverse_complement(kmer_of_interest)
-                    num_single_subst += kmers_orig_count[kmer_of_interest]
+                    try:
+                        kmer_of_interest = reverse_complement(kmer_of_interest)
+                        num_single_subst += kmers_orig_count[kmer_of_interest]
+                    except:
+                        print('Error:', kmer_of_interest)
 
     return num_single_subst, num_single_delt, num_single_insert
 
