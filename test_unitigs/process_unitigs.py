@@ -152,8 +152,15 @@ def count_kmers_single_subst_delt_insert(bridging_unitig_pairs, k, kmers_orig_co
                 if kmer_of_interest in kmers_orig_count:
                     num_single_subst += kmers_orig_count[kmer_of_interest]
                 else:
-                    kmer_of_interest = reverse_complement(kmer_of_interest)
-                    num_single_subst += kmers_orig_count[kmer_of_interest]
+                    try:
+                        kmer_of_interest = reverse_complement(kmer_of_interest)
+                        num_single_subst += kmers_orig_count[kmer_of_interest]
+                    except:
+                        print(seqA)
+                        print(seqB)
+                        print(kmer_of_interest)
+                        print(i)
+                        exit(-1)
 
         in_numbers = [0 for i in range(num_chars)]
         for i in range(num_chars):
