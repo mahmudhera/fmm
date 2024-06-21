@@ -7,6 +7,7 @@
 #include <fstream>
 #include <algorithm>
 #include <cassert>
+#include <set>
 
 
 using namespace std;
@@ -102,6 +103,11 @@ public:
         size_t num_kmers_single_substitution = 0;
         size_t num_kmers_no_mutation = 0;
 
+        // sets for kmers
+        set<string> kmers_with_single_insertion;
+        set<string> kmers_with_single_deletion;
+        set<string> kmers_with_single_substitution;
+
         for (size_t i = 0; i < orig_length - k + 1; i++) {
             int sum1 = 0;
             int sum2 = 0;
@@ -111,17 +117,42 @@ public:
             }
             if (sum1 == 3 && sum2 == 0) {
                 num_kmers_single_deletion++;
+                kmers_with_single_deletion.insert(final_str.substr(i, k));
             }
             if (sum1 == 2 && sum2 == 0) {
                 num_kmers_single_substitution++;
+                kmers_with_single_substitution.insert(final_str.substr(i, k));
             }
             if (sum1 == 0 && sum2 == 1) {
                 num_kmers_single_insertion++;
+                kmers_with_single_insertion.insert(final_str.substr(i, k));
             }
             if (sum1 == 0 && sum2 == 0) {
                 num_kmers_no_mutation++;
             }
         }
+
+
+        // open three files and write the kmers to them
+        ofstream kmer_file_insertion("kmers_single_insertion");
+        ofstream kmer_file_deletion("kmers_single_deletion");
+        ofstream kmer_file_substitution("kmers_single_substitution");
+
+        for (auto kmer : kmers_with_single_insertion) {
+            kmer_file_insertion << kmer << endl;
+        }
+
+        for (auto kmer : kmers_with_single_deletion) {
+            kmer_file_deletion << kmer << endl;
+        }
+
+        for (auto kmer : kmers_with_single_substitution) {
+            kmer_file_substitution << kmer << endl;
+        }
+
+        kmer_file_insertion.close();
+        kmer_file_deletion.close();
+        kmer_file_substitution.close();
 
         size_t num_kmers_single_insertion_special = 0;
         size_t num_kmers_single_deletion_special = 0;
