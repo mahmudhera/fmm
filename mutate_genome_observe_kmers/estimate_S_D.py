@@ -56,7 +56,18 @@ def estimate_S_D(genome_string, mutated_genome_string, k):
                         if long_kmer_orig[-2:-1] == long_kmer_mut[-2:-1]:
                             num_kmers_single_subst += 1
 
+    num_kmers_single_delt = 0
+    k_plus_one_mers_orig = get_kmers(genome_string, k+1)
+    for k_plus_one_mer in k_plus_one_mers_orig:
+        for i in range(k+1):
+            new_kmer = k_plus_one_mer[:i] + k_plus_one_mer[i+1:]
+            if new_kmer in kmers_orig_set:
+                continue
+            if new_kmer in kmers_mutated_set:
+                num_kmers_single_delt += 1
+
     print(num_kmers_single_subst)
+    print(num_kmers_single_delt)
             
 
     
