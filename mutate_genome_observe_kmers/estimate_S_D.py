@@ -75,9 +75,7 @@ def estimate_S_D(genome_string, mutated_genome_string, k):
             if new_kmer in kmers_orig_set or new_kmer in kmers_marked_for_subst:
                 continue
             if new_kmer in kmers_mutated_set:
-                if i != 0 and i != k:
-                    num_kmers_single_delt += 1
-                elif i == 0:
+                if i == 0:
                     if new_kmer not in mut_kmer_to_long_kmer_where_kmer_suffix:
                         continue
                     if k_plus_one_mer not in orig_k_plus_one_mer_where_it_is_suffix:
