@@ -7,19 +7,29 @@ from read_genome import get_kmers
 
 def estimate_S_D(genome_string, mutated_genome_string, k):
     # get k-mers in the original string
-    kmers_orig = get_kmers(genome_string, k)
     long_kmers_orig = get_kmers(genome_string, k+1)
+    kmers_orig_set = set(get_kmers(genome_string, k))
 
-    kmers_orig_set = set(kmers_orig)
-    long_kmers_orig_set = set(long_kmers_orig)
+    orig_kmer_to_long_kmer_where_kmer_prefix = {}
+    orig_kmer_to_long_kmer_where_kmer_suffix = {}
+
+    for long_kmer in long_kmers_orig:
+        orig_kmer_to_long_kmer_where_kmer_prefix[long_kmer[:k]] = long_kmer
+        orig_kmer_to_long_kmer_where_kmer_suffix[long_kmer[1:]] = long_kmer
 
     # get k-mers in the mutated string
     kmers_mutated = get_kmers(mutated_genome_string, k)
-
     kmers_mutated_set = set(kmers_mutated)
 
+    mut_kmer_to_long_kmer_where_kmer_prefix = {}
+    mut_kmer_to_long_kmer_where_kmer_suffix = {}
+
+    for long_kmer in get_kmers(mutated_genome_string, k+1):
+        mut_kmer_to_long_kmer_where_kmer_prefix[long_kmer[:k]] = long_kmer
+        mut_kmer_to_long_kmer_where_kmer_suffix[long_kmer[1:]] = long_kmer
+
     num_kmers_single_subst = 0
-    for kmer_orig in kmers_orig:
+    for kmer_orig in kmers_orig_set:
         # generate new kmer by substituting one character in kmer_orig
         for i in range(k):
             for base in ['A', 'C', 'G', 'T']:
@@ -29,8 +39,18 @@ def estimate_S_D(genome_string, mutated_genome_string, k):
                 if new_kmer in kmers_orig_set:
                     continue
                 if new_kmer in kmers_mutated_set:
-                    num_kmers_single_subst += 1
-                    break
+                    if i != 0 and i != k-1:
+                        num_kmers_single_subst += 1
+                    elif i == 0:
+                        long_kmer_orig = orig_kmer_to_long_kmer_where_kmer_suffix[kmer_orig]
+                        long_kmer_mut = mut_kmer_to_long_kmer_where_kmer_suffix[new_kmer]
+                        if long_kmer_orig[0] == long_kmer_mut[0]:
+                            num_kmers_single_subst += 1
+                    else:
+                        long_kmer_orig = orig_kmer_to_long_kmer_where_kmer_prefix[kmer_orig]
+                        long_kmer_mut = mut_kmer_to_long_kmer_where_kmer_prefix[new_kmer]
+                        if long_kmer_orig[-1] == long_kmer_mut[-1]:
+                            num_kmers_single_subst += 1
 
     print(num_kmers_single_subst)
             
