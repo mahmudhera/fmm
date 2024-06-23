@@ -1,16 +1,4 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import generic_dna
-import random
-import os
-import subprocess
-import time
-import itertools
+import sys
 
 from read_genome import read_genome
 from read_genome import clean_genome_string
@@ -52,7 +40,7 @@ def estimate_S_D(genome_string, mutated_genome_string, k):
 
 if __name__ == '__main__':
     genome_name = 'ndl.fasta'
-    mutated_genome_name = 
+    mutated_genome_name = sys.argv[1]
     k = 21
 
     # read the genome and mutated genome
