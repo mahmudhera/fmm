@@ -20,18 +20,17 @@ def estimate_S_D(genome_string, mutated_genome_string, k):
 
     num_kmers_single_subst = 0
     for kmer_orig in kmers_orig:
-        for kmer_mutated in kmers_mutated:
-            # generate new kmer by substituting one character in kmer_orig
-            for i in range(k):
-                for base in ['A', 'C', 'G', 'T']:
-                    if base == kmer_orig[i]:
-                        continue
-                    new_kmer = kmer_orig[:i] + base + kmer_orig[i+1:]
-                    if new_kmer in kmers_orig_set:
-                        continue
-                    if new_kmer == kmer_mutated:
-                        num_kmers_single_subst += 1
-                        break
+        # generate new kmer by substituting one character in kmer_orig
+        for i in range(k):
+            for base in ['A', 'C', 'G', 'T']:
+                if base == kmer_orig[i]:
+                    continue
+                new_kmer = kmer_orig[:i] + base + kmer_orig[i+1:]
+                if new_kmer in kmers_orig_set:
+                    continue
+                if new_kmer in kmers_mutated_set:
+                    num_kmers_single_subst += 1
+                    break
 
     print(num_kmers_single_subst)
             
