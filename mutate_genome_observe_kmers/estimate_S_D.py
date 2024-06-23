@@ -42,11 +42,15 @@ def estimate_S_D(genome_string, mutated_genome_string, k):
                     if i != 0 and i != k-1:
                         num_kmers_single_subst += 1
                     elif i == 0:
+                        if new_kmer not in mut_kmer_to_long_kmer_where_kmer_suffix or new_kmer not in orig_kmer_to_long_kmer_where_kmer_suffix:
+                            continue
                         long_kmer_orig = orig_kmer_to_long_kmer_where_kmer_suffix[kmer_orig]
                         long_kmer_mut = mut_kmer_to_long_kmer_where_kmer_suffix[new_kmer]
                         if long_kmer_orig[0:1] == long_kmer_mut[0:1]:
                             num_kmers_single_subst += 1
                     else:
+                        if new_kmer not in mut_kmer_to_long_kmer_where_kmer_prefix or new_kmer not in orig_kmer_to_long_kmer_where_kmer_prefix:
+                            continue
                         long_kmer_orig = orig_kmer_to_long_kmer_where_kmer_prefix[kmer_orig]
                         long_kmer_mut = mut_kmer_to_long_kmer_where_kmer_prefix[new_kmer]
                         if long_kmer_orig[-2:-1] == long_kmer_mut[-2:-1]:
