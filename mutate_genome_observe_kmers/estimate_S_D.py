@@ -29,6 +29,7 @@ def estimate_S_D(genome_string, mutated_genome_string, k):
         mut_kmer_to_long_kmer_where_kmer_suffix[long_kmer[2:]] = long_kmer
 
     num_kmers_single_subst = 0
+    kmers_marked_for_subst = set()
     for kmer_orig in kmers_orig_set:
         # generate new kmer by substituting one character in kmer_orig
         for i in range(k):
@@ -41,6 +42,7 @@ def estimate_S_D(genome_string, mutated_genome_string, k):
                 if new_kmer in kmers_mutated_set:
                     if i != 0 and i != k-1:
                         num_kmers_single_subst += 1
+                        kmers_marked_for_subst.add(kmer_orig)
                     elif i == 0:
                         if new_kmer not in mut_kmer_to_long_kmer_where_kmer_suffix or new_kmer not in orig_kmer_to_long_kmer_where_kmer_suffix:
                             continue
@@ -48,6 +50,7 @@ def estimate_S_D(genome_string, mutated_genome_string, k):
                         long_kmer_mut = mut_kmer_to_long_kmer_where_kmer_suffix[new_kmer]
                         if long_kmer_orig[0:1] == long_kmer_mut[0:1]:
                             num_kmers_single_subst += 1
+                            kmers_marked_for_subst.add(kmer_orig)
                     else:
                         if new_kmer not in mut_kmer_to_long_kmer_where_kmer_prefix or new_kmer not in orig_kmer_to_long_kmer_where_kmer_prefix:
                             continue
@@ -55,13 +58,14 @@ def estimate_S_D(genome_string, mutated_genome_string, k):
                         long_kmer_mut = mut_kmer_to_long_kmer_where_kmer_prefix[new_kmer]
                         if long_kmer_orig[-2:-1] == long_kmer_mut[-2:-1]:
                             num_kmers_single_subst += 1
+                            kmers_marked_for_subst.add(kmer_orig)
 
     num_kmers_single_delt = 0
     k_plus_one_mers_orig = get_kmers(genome_string, k+1)
     for k_plus_one_mer in k_plus_one_mers_orig:
         for i in range(k+1):
             new_kmer = k_plus_one_mer[:i] + k_plus_one_mer[i+1:]
-            if new_kmer in kmers_orig_set:
+            if new_kmer in kmers_orig_set or new_kmer in kmers_marked_for_subst:
                 continue
             if new_kmer in kmers_mutated_set:
                 num_kmers_single_delt += 1
