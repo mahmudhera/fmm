@@ -138,7 +138,7 @@ pair<uint64_t, uint64_t> estimate_single_sub_del(vector<string> kmers_orig, vect
 
 // Another function to estimate number of kmers with single substitution and deletion
 // returns both estimates
-pair<int, int> estimate_S_D(string genome_string, string mutated_genome_string, int k) {
+pair<size_t, size_t> estimate_S_D(string genome_string, string mutated_genome_string, int k) {
     // Get kmers in the original string
     vector<string> long_kmers_orig = get_kmers(genome_string, k+2);
     vector<string> kmers_orig_vector = get_kmers(genome_string, k);
@@ -164,7 +164,7 @@ pair<int, int> estimate_S_D(string genome_string, string mutated_genome_string, 
         mut_kmer_to_long_kmer_where_kmer_suffix[long_kmer.substr(2)] = long_kmer;
     }
 
-    int num_kmers_single_subst = 0;
+    size_t num_kmers_single_subst = 0;
     set<string> kmers_marked_for_subst;
     for (const string& kmer_orig : kmers_orig_set) {
         // Generate new kmer by substituting one character in kmer_orig
@@ -210,7 +210,7 @@ pair<int, int> estimate_S_D(string genome_string, string mutated_genome_string, 
         }
     }
 
-    int num_kmers_single_delt = 0;
+    size_t num_kmers_single_delt = 0;
     vector<string> k_plus_one_mers_orig = get_kmers(genome_string, k+1);
     map<string, string> orig_k_plus_one_mer_where_it_is_suffix;
     map<string, string> orig_k_plus_one_mer_where_it_is_prefix;
@@ -342,13 +342,19 @@ int main(int argc, char* argv[]) {
 
     // estimate the number of kmers with single substitution and deletion
     pair<uint64_t, uint64_t> estimates = estimate_single_sub_del(kmers_orig, kplusone_mers_orig, kmers_mut);
+    pair<uint64_t, uint64_t> estimates2 = estimate_S_D(str_orig, str_mut, 21);
 
     // extract them to variables
     uint64_t num_kmer_single_subst = estimates.first;
     uint64_t num_kmer_single_del = estimates.second;
 
+    uint64_t num_kmer_single_subst2 = estimates2.first;
+    uint64_t num_kmer_single_del2 = estimates2.second;
+
     // calculate the mutation rates
     tuple<double, double, double> rates = estimate_mut_rates(str_orig.size(), str_mut.size(), num_kmer_single_subst, num_kmer_single_del, count(str_orig.begin(), str_orig.end(), 'A'), count(str_mut.begin(), str_mut.end(), 'A'));
+    tuple<double, double, double> rates2 = estimate_mut_rates(str_orig.size(), str_mut.size(), num_kmer_single_subst2, num_kmer_single_del2, count(str_orig.begin(), str_orig.end(), 'A'), count(str_mut.begin(), str_mut.end(), 'A'));
+
 
     // extract the rates
     double subst_rate = get<0>(rates);
