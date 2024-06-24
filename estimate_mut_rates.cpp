@@ -135,6 +135,133 @@ pair<uint64_t, uint64_t> estimate_single_sub_del(vector<string> kmers_orig, vect
 }
 
 
+
+// Another function to estimate number of kmers with single substitution and deletion
+// returns both estimates
+pair<int, int> estimate_S_D(string genome_string, string mutated_genome_string, int k) {
+    // Get kmers in the original string
+    vector<string> long_kmers_orig = get_kmers(genome_string, k+2);
+    vector<string> kmers_orig_vector = get_kmers(genome_string, k);
+    set<string> kmers_orig_set(kmers_orig_vector.begin(), kmers_orig_vector.end());
+
+    map<string, string> orig_kmer_to_long_kmer_where_kmer_prefix;
+    map<string, string> orig_kmer_to_long_kmer_where_kmer_suffix;
+
+    for (const string& long_kmer : long_kmers_orig) {
+        orig_kmer_to_long_kmer_where_kmer_prefix[long_kmer.substr(0, k)] = long_kmer;
+        orig_kmer_to_long_kmer_where_kmer_suffix[long_kmer.substr(1)] = long_kmer;
+    }
+
+    // Get kmers in the mutated string
+    vector<string> kmers_mutated = get_kmers(mutated_genome_string, k);
+    set<string> kmers_mutated_set(kmers_mutated.begin(), kmers_mutated.end());
+
+    map<string, string> mut_kmer_to_long_kmer_where_kmer_prefix;
+    map<string, string> mut_kmer_to_long_kmer_where_kmer_suffix;
+
+    for (const string& long_kmer : get_kmers(mutated_genome_string, k+1)) {
+        mut_kmer_to_long_kmer_where_kmer_prefix[long_kmer.substr(0, k)] = long_kmer;
+        mut_kmer_to_long_kmer_where_kmer_suffix[long_kmer.substr(2)] = long_kmer;
+    }
+
+    int num_kmers_single_subst = 0;
+    set<string> kmers_marked_for_subst;
+    for (const string& kmer_orig : kmers_orig_set) {
+        // Generate new kmer by substituting one character in kmer_orig
+        for (int i = 0; i < k; i++) {
+            for (char base : {'A', 'C', 'G', 'T'}) {
+                if (base == kmer_orig[i]) {
+                    continue;
+                }
+                string new_kmer = kmer_orig;
+                new_kmer[i] = base;
+                if (kmers_orig_set.count(new_kmer) > 0) {
+                    continue;
+                }
+                if (kmers_mutated_set.count(new_kmer) > 0) {
+                    if (i != 0 && i != k-1) {
+                        num_kmers_single_subst++;
+                        kmers_marked_for_subst.insert(kmer_orig);
+                    } else if (i == 0) {
+                        if (mut_kmer_to_long_kmer_where_kmer_suffix.count(new_kmer) == 0 ||
+                            orig_kmer_to_long_kmer_where_kmer_suffix.count(kmer_orig) == 0) {
+                            continue;
+                        }
+                        string long_kmer_orig = orig_kmer_to_long_kmer_where_kmer_suffix[kmer_orig];
+                        string long_kmer_mut = mut_kmer_to_long_kmer_where_kmer_suffix[new_kmer];
+                        if (long_kmer_orig.substr(0, 2) == long_kmer_mut.substr(0, 2)) {
+                            num_kmers_single_subst++;
+                            kmers_marked_for_subst.insert(kmer_orig);
+                        }
+                    } else {
+                        if (mut_kmer_to_long_kmer_where_kmer_prefix.count(new_kmer) == 0 ||
+                            orig_kmer_to_long_kmer_where_kmer_prefix.count(kmer_orig) == 0) {
+                            continue;
+                        }
+                        string long_kmer_orig = orig_kmer_to_long_kmer_where_kmer_prefix[kmer_orig];
+                        string long_kmer_mut = mut_kmer_to_long_kmer_where_kmer_prefix[new_kmer];
+                        if (long_kmer_orig.substr(long_kmer_orig.length() - 2, 2) == long_kmer_mut.substr(long_kmer_mut.length() - 2, 2)) {
+                            num_kmers_single_subst++;
+                            kmers_marked_for_subst.insert(kmer_orig);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    int num_kmers_single_delt = 0;
+    vector<string> k_plus_one_mers_orig = get_kmers(genome_string, k+1);
+    map<string, string> orig_k_plus_one_mer_where_it_is_suffix;
+    map<string, string> orig_k_plus_one_mer_where_it_is_prefix;
+
+    for (const string& long_kmer : long_kmers_orig) {
+        orig_k_plus_one_mer_where_it_is_suffix[long_kmer.substr(0, k+1)] = long_kmer;
+        orig_k_plus_one_mer_where_it_is_prefix[long_kmer.substr(1)] = long_kmer;
+    }
+
+    for (const string& k_plus_one_mer : k_plus_one_mers_orig) {
+        for (int i = 0; i < k+1; i++) {
+            string new_kmer = k_plus_one_mer;
+            new_kmer.erase(i, 1);
+            if (kmers_orig_set.count(new_kmer) > 0 || kmers_marked_for_subst.count(new_kmer) > 0) {
+                continue;
+            }
+            if (kmers_mutated_set.count(new_kmer) > 0) {
+                if (i == 0) {
+                    if (mut_kmer_to_long_kmer_where_kmer_suffix.count(new_kmer) == 0) {
+                        continue;
+                    }
+                    if (orig_k_plus_one_mer_where_it_is_suffix.count(k_plus_one_mer) == 0) {
+                        continue;
+                    }
+                    string long_kmer_mut = mut_kmer_to_long_kmer_where_kmer_suffix[new_kmer];
+                    string long_kmer_orig = orig_k_plus_one_mer_where_it_is_suffix[k_plus_one_mer];
+                    if (long_kmer_mut[0] == long_kmer_orig[0]) {
+                        num_kmers_single_delt++;
+                    }
+                } else {
+                    if (mut_kmer_to_long_kmer_where_kmer_prefix.count(new_kmer) == 0) {
+                        continue;
+                    }
+                    if (orig_k_plus_one_mer_where_it_is_prefix.count(k_plus_one_mer) == 0) {
+                        continue;
+                    }
+                    string long_kmer_mut = mut_kmer_to_long_kmer_where_kmer_prefix[new_kmer];
+                    string long_kmer_orig = orig_k_plus_one_mer_where_it_is_prefix[k_plus_one_mer];
+                    if (long_kmer_mut[long_kmer_mut.length() - 1] == long_kmer_orig[long_kmer_orig.length() - 1]) {
+                        num_kmers_single_delt++;
+                    }
+                }
+            }
+        }
+    }
+
+    return make_pair(num_kmers_single_subst, num_kmers_single_delt);
+}
+
+
+
 // function to estimate the mutation rates, returns three doubles
 // substitution rate, insertion rate, and deletion rate
 tuple<double, double, double> estimate_mut_rates(int len_orig, int len_mut, int num_kmer_single_subst, int num_kmer_single_del, int num_A_orig, int num_A_mut) {

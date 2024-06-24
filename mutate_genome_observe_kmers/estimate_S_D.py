@@ -48,7 +48,7 @@ def estimate_S_D(genome_string, mutated_genome_string, k):
                             continue
                         long_kmer_orig = orig_kmer_to_long_kmer_where_kmer_suffix[kmer_orig]
                         long_kmer_mut = mut_kmer_to_long_kmer_where_kmer_suffix[new_kmer]
-                        if long_kmer_orig[0:1] == long_kmer_mut[0:1]:
+                        if long_kmer_orig[0:2] == long_kmer_mut[0:2]:
                             num_kmers_single_subst += 1
                             kmers_marked_for_subst.add(kmer_orig)
                     else:
@@ -56,7 +56,7 @@ def estimate_S_D(genome_string, mutated_genome_string, k):
                             continue
                         long_kmer_orig = orig_kmer_to_long_kmer_where_kmer_prefix[kmer_orig]
                         long_kmer_mut = mut_kmer_to_long_kmer_where_kmer_prefix[new_kmer]
-                        if long_kmer_orig[-2:-1] == long_kmer_mut[-2:-1]:
+                        if long_kmer_orig[-2:] == long_kmer_mut[-2:]:
                             num_kmers_single_subst += 1
                             kmers_marked_for_subst.add(kmer_orig)
 
