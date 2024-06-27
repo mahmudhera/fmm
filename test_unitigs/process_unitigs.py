@@ -292,6 +292,8 @@ def main2():
     num_kmers_single_subst = 0
     num_kmers_single_delt = 0
 
+    f = open('log_file', 'w')
+
     num_completed = 0
     print('Number of unitigs:', len(unitigs_orig))
     for unitig1 in unitigs_orig:
@@ -329,16 +331,23 @@ def main2():
         for i in range(num_chars):
             if seqB[i] == '-' and seqA[i] in alphabet:
                 in_numbers[i] = 1
-            else:
+            elif seqA[i] != seqB[i]:
                 in_numbers[i] = 2
 
         for i in range(num_chars-k+1):
             if sum(in_numbers[i:i+k]) == 1:
                 num_kmers_single_delt += 1
 
+        f.write(seqA + '\n')
+        f.write(seqB + '\n')
+        f.write('--\n')
+
+
         # show progress
         num_completed += 1
         print('Completed {num_completed} unitigs'.format(num_completed=num_completed), end='\r')
+
+    f.close()
 
     print()
     print(num_kmers_single_subst)
