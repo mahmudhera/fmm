@@ -292,6 +292,7 @@ def main2():
     num_kmers_single_subst = 0
     num_kmers_single_delt = 0
 
+    num_completed = 0
     for unitig1 in unitigs_orig:
         best_match_score = -999999999
         best_match_alignment = None
@@ -334,6 +335,10 @@ def main2():
             if sum(in_numbers[i:i+k]) == 1:
                 num_kmers_single_delt += 1
 
+        # show progress
+        print('Completed {num_completed} unitigs'.format(num_completed=num_completed), end='\r')
+
+    print()
     print(num_kmers_single_subst)
     print(num_kmers_single_delt)
                 
