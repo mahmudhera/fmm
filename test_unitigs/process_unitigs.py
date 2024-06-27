@@ -280,5 +280,68 @@ def main():
     print('Number of single insertions:', num_single_insert)
 
 
+
+def main2():
+    unitigs_orig_filename = 'cdbg_orig.fa'
+    unitigs_mutated_filename = 'cdbg_mutated.fa'
+    k = 21
+
+    unitigs_orig = read_unitigs(unitigs_orig_filename)
+    unitigs_mutated = read_unitigs(unitigs_mutated_filename)
+
+    num_kmers_single_subst = 0
+    num_kmers_single_delt = 0
+
+    for unitig1 in unitigs_orig:
+        best_match_score = -999999999
+        best_match_alignment = None
+        for unitig2 in unitigs_mutated:
+            alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
+            if alignment.score > best_match_score:
+                best_match_score = alignment.score
+                best_match_alignment = alignment
+            unitig2 = reverse_complement(unitig2)
+            alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
+            if alignment.score > best_match_score:
+                best_match_score = alignment.score
+                best_match_alignment = alignment
+        
+        alignment = best_match_alignment
+        seqA = alignment.seqA
+        seqB = alignment.seqB
+        
+        num_chars = len(seqA)
+        in_numbers = [0 for i in range(num_chars)]
+        for i in range(num_chars):
+            if seqA[i] != seqB[i]:
+                if seqA[i] in alphabet and seqB[i] in alphabet:
+                    in_numbers[i] = 1
+                else:
+                    in_numbers[i] = 2
+        
+        for i in range(num_chars-k+1):
+            if sum(in_numbers[i:i+k]) == 1:
+                num_kmers_single_subst += 1
+
+        in_numbers = [0 for i in range(num_chars)]
+        for i in range(num_chars):
+            if seqB[i] == '-' and seqA[i] in alphabet:
+                in_numbers[i] = 1
+            else:
+                in_numbers[i] = 2
+
+        for i in range(num_chars-k+1):
+            if sum(in_numbers[i:i+k]) == 1:
+                num_kmers_single_delt += 1
+
+    print(num_kmers_single_subst)
+    print(num_kmers_single_delt)
+                
+
+        
+
+
+
+
 if __name__ == '__main__':
-    main()
+    main2()
