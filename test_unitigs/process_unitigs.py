@@ -293,6 +293,7 @@ def main2():
     num_kmers_single_delt = 0
 
     num_completed = 0
+    print('Number of unitigs:', len(unitigs_orig))
     for unitig1 in unitigs_orig:
         best_match_score = -999999999
         best_match_alignment = None
