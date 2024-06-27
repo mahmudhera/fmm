@@ -292,23 +292,27 @@ def main2():
     num_kmers_single_subst = 0
     num_kmers_single_delt = 0
 
-    f = open('log_file', 'w')
+    f = open('log_alignments', 'w')
+    f2 = open('log_lengths', 'w')
 
     num_completed = 0
     print('Number of unitigs:', len(unitigs_orig))
     for unitig1 in unitigs_orig:
         best_match_score = -999999999
         best_match_alignment = None
+        best_match_length = -1
         for unitig2 in unitigs_mutated:
             alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
             if alignment.score > best_match_score:
                 best_match_score = alignment.score
                 best_match_alignment = alignment
+                best_match_length = len(unitig2)
             unitig2 = reverse_complement(unitig2)
             alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
             if alignment.score > best_match_score:
                 best_match_score = alignment.score
                 best_match_alignment = alignment
+                best_match_length = len(unitig2)
         
         alignment = best_match_alignment
         seqA = alignment.seqA
@@ -342,12 +346,15 @@ def main2():
         f.write(seqB + '\n')
         f.write('--\n')
 
+        f2.write(str(len(unitig1)) + ',' + str(best_match_length) + '\n')
+
 
         # show progress
         num_completed += 1
         print('Completed {num_completed} unitigs'.format(num_completed=num_completed), end='\r')
 
     f.close()
+    f2.close()
 
     print()
     print(num_kmers_single_subst)
