@@ -336,6 +336,7 @@ def main2():
                 num_kmers_single_delt += 1
 
         # show progress
+        num_completed += 1
         print('Completed {num_completed} unitigs'.format(num_completed=num_completed), end='\r')
 
     print()
