@@ -2,6 +2,7 @@ import time
 from Bio import SeqIO
 from Bio import pairwise2
 from Bio.pairwise2 import format_alignment
+import multiprocessing
 
 alphabet = set('ACGT')
 
@@ -400,12 +401,107 @@ def main2():
     print()
     print(num_kmers_single_subst)
     print(num_kmers_single_delt)
-                
 
+
+
+def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths_mutated, k, multiplier):
+    num_kmers_single_subst = 0
+    num_kmers_single_delt = 0
+    results = []
+
+    for unitig1 in unitigs_orig_subset:
+        best_match_score = -999999999
+        best_match_alignment = None
+
+        unitig_2_length_low = len(unitig1) / multiplier
+        unitig_2_length_high = len(unitig1) * multiplier
+
+        low_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_low)
+        high_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_high)
+
+        low_index = max(0, low_index)
+        high_index = min(len(unitigs_mutated)-1, high_index)
+
+        for unitig2 in unitigs_mutated[low_index:high_index+1]:
+            alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
+            if alignment.score > best_match_score:
+                best_match_score = alignment.score
+                best_match_alignment = alignment
+
+            unitig2 = reverse_complement(unitig2)
+            alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
+            if alignment.score > best_match_score:
+                best_match_score = alignment.score
+                best_match_alignment = alignment
         
+        alignment = best_match_alignment
+        seqA = alignment.seqA
+        seqB = alignment.seqB
+        
+        num_chars = len(seqA)
+        in_numbers = [0 for i in range(num_chars)]
+        for i in range(num_chars):
+            if seqA[i] != seqB[i]:
+                if seqA[i] in alphabet and seqB[i] in alphabet:
+                    in_numbers[i] = 1
+                else:
+                    in_numbers[i] = 2
+        
+        for i in range(num_chars-k+1):
+            if sum(in_numbers[i:i+k]) == 1:
+                num_kmers_single_subst += 1
+
+        in_numbers = [0 for i in range(num_chars)]
+        for i in range(num_chars):
+            if seqB[i] == '-' and seqA[i] in alphabet:
+                in_numbers[i] = 1
+            elif seqA[i] != seqB[i]:
+                in_numbers[i] = 2
+
+        for i in range(num_chars-k+1):
+            if sum(in_numbers[i:i+k]) == 1:
+                num_kmers_single_delt += 1
+        
+        results.append((num_kmers_single_subst, num_kmers_single_delt))
+
+    return results
+
+
+
+def main3():
+    unitigs_orig_filename = 'cdbg_orig.fa'
+    unitigs_mutated_filename = 'cdbg_mutated.fa'
+    k = 21
+    multiplier = 3.0
+
+    unitigs_orig = read_unitigs(unitigs_orig_filename)
+    unitigs_mutated = read_unitigs(unitigs_mutated_filename)
+
+    # Sort the unitigs by length, small to large
+    unitigs_mutated = sorted(list(unitigs_mutated), key=lambda x: len(x))
+    list_of_unitig_lengths_mutated = [len(unitig) for unitig in unitigs_mutated]
+
+    # Divide the work among multiple processes
+    num_cores = multiprocessing.cpu_count()
+    chunk_size = len(unitigs_orig) // num_cores
+    chunks = [unitigs_orig[i:i + chunk_size] for i in range(0, len(unitigs_orig), chunk_size)]
+
+    pool = multiprocessing.Pool(num_cores)
+    results = pool.starmap(process_unitigs, [(chunk, unitigs_mutated, list_of_unitig_lengths_mutated, k, multiplier) for chunk in chunks])
+
+    # Aggregate results
+    num_kmers_single_subst = 0
+    num_kmers_single_delt = 0
+    for result in results:
+        for subst, delt in result:
+            num_kmers_single_subst += subst
+            num_kmers_single_delt += delt
+
+    print(num_kmers_single_subst)
+    print(num_kmers_single_delt)
 
 
 
 
 if __name__ == '__main__':
-    main2()
+    main3()
