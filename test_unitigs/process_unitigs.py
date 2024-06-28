@@ -419,8 +419,8 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
         low_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_low)
         high_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_high)
 
-        low_index = max(0, low_index)
-        high_index = min(len(unitigs_mutated)-1, high_index)
+        low_index = max(0, low_index-1)
+        high_index = min(len(unitigs_mutated)-1, high_index+1)
 
         for unitig2 in unitigs_mutated[low_index:high_index+1]:
             alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
