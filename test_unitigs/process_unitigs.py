@@ -416,13 +416,14 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
         unitig_2_length_low = len(unitig1) / multiplier
         unitig_2_length_high = len(unitig1) * multiplier
 
-        low_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_low)
-        high_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_high)
+        #low_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_low)
+        #high_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_high)
 
-        low_index = max(0, low_index-1)
-        high_index = min(len(unitigs_mutated)-1, high_index+1)
+        #low_index = max(0, low_index-1)
+        #high_index = min(len(unitigs_mutated)-1, high_index+1)
 
-        for unitig2 in unitigs_mutated[low_index:high_index+1]:
+        #for unitig2 in unitigs_mutated[low_index:high_index+1]:
+        for unitig2 in unitigs_mutated:
             alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
             if alignment.score > best_match_score:
                 best_match_score = alignment.score
