@@ -484,7 +484,8 @@ def main3():
     # Divide the work among multiple processes
     num_cores = multiprocessing.cpu_count()
     chunk_size = len(unitigs_orig) // num_cores
-    chunks = [unitigs_orig[i:i + chunk_size] for i in range(0, len(unitigs_orig), chunk_size)]
+    unitigs_orig_list = list(unitigs_orig)
+    chunks = [unitigs_orig_list[i:i + chunk_size] for i in range(0, len(unitigs_orig), chunk_size)]
 
     pool = multiprocessing.Pool(num_cores)
     results = pool.starmap(process_unitigs, [(chunk, unitigs_mutated, list_of_unitig_lengths_mutated, k, multiplier) for chunk in chunks])
