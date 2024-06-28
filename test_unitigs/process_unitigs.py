@@ -339,7 +339,10 @@ def main2():
         low_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_low)
         high_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_high)
 
-        for unitig2 in unitigs_mutated[low_index:high_index]:
+        low_index = max(0, low_index)
+        high_index = min(len(unitigs_mutated)-1, high_index)
+
+        for unitig2 in unitigs_mutated[low_index:high_index+1]:
             alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
             if alignment.score > best_match_score:
                 best_match_score = alignment.score
