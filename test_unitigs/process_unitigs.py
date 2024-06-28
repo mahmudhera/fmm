@@ -280,14 +280,45 @@ def main():
     print('Number of single insertions:', num_single_insert)
 
 
+# returns index such that sorted_list[index] <= query < sorted_list[index+1]
+def find_index(sorted_list, query):
+    low, high = 0, len(sorted_list) - 1
+    
+    # If the query is out of bounds, handle edge cases
+    if query < sorted_list[0]:
+        return -1
+    if query > sorted_list[-1]:
+        return len(sorted_list)
+    
+    while low <= high:
+        mid = (low + high) // 2
+        
+        if sorted_list[mid] == query:
+            return mid
+        elif sorted_list[mid] < query:
+            low = mid + 1
+        else:
+            high = mid - 1
+    
+    return high
+
+
 
 def main2():
     unitigs_orig_filename = 'cdbg_orig.fa'
     unitigs_mutated_filename = 'cdbg_mutated.fa'
     k = 21
+    multiplier = 3.0
 
     unitigs_orig = read_unitigs(unitigs_orig_filename)
     unitigs_mutated = read_unitigs(unitigs_mutated_filename)
+
+    # sort the unitigs by length, small to large
+    unitigs_orig = sorted(list(unitigs_orig), key=lambda x: len(x))
+    unitigs_mutated = sorted(list(unitigs_mutated), key=lambda x: len(x))
+
+    list_of_unitig_lengths_orig = [len(unitig) for unitig in unitigs_orig]
+    list_of_unitig_lengths_mutated = [len(unitig) for unitig in unitigs_mutated]
 
     num_kmers_single_subst = 0
     num_kmers_single_delt = 0
@@ -301,7 +332,14 @@ def main2():
         best_match_score = -999999999
         best_match_alignment = None
         best_match_length = -1
-        for unitig2 in unitigs_mutated:
+
+        unitig_2_length_low = len(unitig1) / multiplier
+        unitig_2_length_high = len(unitig1) * multiplier
+
+        low_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_low)
+        high_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_high)
+
+        for unitig2 in unitigs_mutated[low_index:high_index]:
             alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
             if alignment.score > best_match_score:
                 best_match_score = alignment.score
