@@ -1,3 +1,13 @@
+"""
+This script takes two fasta files as inputs
+Builds the bdg graph for these two inputs
+Goes over all unitigs
+Compares unitig vs unitig
+And writes num of kmers with single subst and delt
+in an output file
+"""
+
+
 import time
 from Bio import SeqIO
 from Bio import pairwise2
@@ -478,12 +488,14 @@ def main3():
     parser.add_argument('orig_filename', type=str, help='Filename of original string')
     parser.add_argument('mut_filename', type=str, help='Filename of mutated string')
     parser.add_argument('k', type=int, help='Length of k-mers')
+    parser.add_argument('o', type=str, help='Output filename')
 
     args = parser.parse_args()
 
     orig_filename = args.orig_filename
     mut_filename = args.mut_filename
     k = args.k
+    output_filename = args.o
     multiplier = 3.0
 
     # invoke cuttlefish2 with the files and generate the unitigs
@@ -527,9 +539,10 @@ def main3():
             num_kmers_single_subst += subst
             num_kmers_single_delt += delt
 
-    print(num_kmers_single_subst)
-    print(num_kmers_single_delt)
-
+    # Write results to output file
+    with open(output_filename, 'w') as f:
+        f.write(str(num_kmers_single_subst) + '\n')
+        f.write(str(num_kmers_single_delt) + '\n')
 
 
 
