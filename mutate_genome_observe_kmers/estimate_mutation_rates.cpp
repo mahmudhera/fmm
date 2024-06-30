@@ -414,11 +414,15 @@ int main(int argc, char* argv[]) {
                     output_file << get<0>(rates_by_known_values) << " " << get<2>(rates_by_known_values) << " " << get<1>(rates_by_known_values) << " ";
                     output_file << get<0>(rates_by_kmers) << " " << get<2>(rates_by_kmers) << " " << get<1>(rates_by_kmers) << endl;
 
+                    // flush the output file
+                    output_file.flush();
                     
                 }
             }
         }
     }
+
+    output_file.close();
 
     return 0;
 }
