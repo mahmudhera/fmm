@@ -315,10 +315,7 @@ def main2():
     unitigs_mutated = read_unitigs(unitigs_mutated_filename)
 
     # sort the unitigs by length, small to large
-    unitigs_orig = sorted(list(unitigs_orig), key=lambda x: len(x))
     unitigs_mutated = sorted(list(unitigs_mutated), key=lambda x: len(x))
-
-    list_of_unitig_lengths_orig = [len(unitig) for unitig in unitigs_orig]
     list_of_unitig_lengths_mutated = [len(unitig) for unitig in unitigs_mutated]
 
     num_kmers_single_subst = 0
@@ -329,7 +326,9 @@ def main2():
 
     num_completed = 0
     print('Number of unitigs:', len(unitigs_orig))
-    for unitig1 in unitigs_orig:
+
+    unitigs_orig_list = list(unitigs_orig)
+    for unitig1 in unitigs_orig_list:
         best_match_score = -999999999
         best_match_alignment = None
         best_match_length = -1
@@ -463,7 +462,7 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
             if sum(in_numbers[i:i+k]) == 1:
                 num_kmers_single_delt += 1
         
-        results.append((num_kmers_single_subst, num_kmers_single_delt))
+    results.append((num_kmers_single_subst, num_kmers_single_delt))
 
     return results
 
