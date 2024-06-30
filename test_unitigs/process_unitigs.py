@@ -3,6 +3,7 @@ from Bio import SeqIO
 from Bio import pairwise2
 from Bio.pairwise2 import format_alignment
 import multiprocessing
+import random
 
 alphabet = set('ACGT')
 
@@ -485,6 +486,7 @@ def main3():
     num_cores = multiprocessing.cpu_count()
     chunk_size = len(unitigs_orig) // num_cores
     unitigs_orig_list = list(unitigs_orig)
+    random.shuffle(unitigs_orig_list)
     chunks = [unitigs_orig_list[i:i + chunk_size] for i in range(0, len(unitigs_orig), chunk_size)]
 
     pool = multiprocessing.Pool(num_cores)
