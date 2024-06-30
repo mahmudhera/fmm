@@ -4,6 +4,8 @@ from Bio import pairwise2
 from Bio.pairwise2 import format_alignment
 import multiprocessing
 import random
+import argparse
+import os
 
 alphabet = set('ACGT')
 
@@ -416,14 +418,14 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
         unitig_2_length_low = len(unitig1) / multiplier
         unitig_2_length_high = len(unitig1) * multiplier
 
-        #low_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_low)
-        #high_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_high)
+        low_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_low)
+        high_index = find_index(list_of_unitig_lengths_mutated, unitig_2_length_high)
 
-        #low_index = max(0, low_index-1)
-        #high_index = min(len(unitigs_mutated)-1, high_index+1)
+        low_index = max(0, low_index-1)
+        high_index = min(len(unitigs_mutated)-1, high_index+1)
 
-        #for unitig2 in unitigs_mutated[low_index:high_index+1]:
-        for unitig2 in unitigs_mutated:
+        for unitig2 in unitigs_mutated[low_index:high_index+1]:
+        #for unitig2 in unitigs_mutated:
             alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
             if alignment.score > best_match_score:
                 best_match_score = alignment.score
@@ -470,10 +472,28 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
 
 
 def main3():
-    unitigs_orig_filename = 'cdbg_orig.fa'
-    unitigs_mutated_filename = 'cdbg_mutated.fa'
-    k = 21
+
+    # parse command line arguments for filenames and k
+    parser = argparse.ArgumentParser()
+    parser.add_argument('orig_filename', type=str, help='Filename of original string')
+    parser.add_argument('mut_filename', type=str, help='Filename of mutated string')
+    parser.add_argument('k', type=int, help='Length of k-mers')
+
+    args = parser.parse_args()
+
+    orig_filename = args.orig_filename
+    mut_filename = args.mut_filename
+    k = args.k
     multiplier = 3.0
+
+    # invoke cuttlefish2 with the files and generate the unitigs
+    # command: cuttlefish build -s <filename> -k <k> -t <thread_count> -o <out_filename> -w . --ref
+    unitigs_orig_filename = orig_filename + '_unitigs'
+    unitigs_mutated_filename = mut_filename + '_unitigs'
+    cmd1 = 'cuttlefish build -s {orig_filename} -k {k} -t 4 -o {unitigs_orig_filename} -w . --ref'.format(orig_filename=orig_filename, k=k, unitigs_orig_filename=unitigs_orig_filename)
+    cmd2 = 'cuttlefish build -s {mut_filename} -k {k} -t 4 -o {unitigs_mutated_filename} -w . --ref'.format(mut_filename=mut_filename, k=k, unitigs_mutated_filename=unitigs_mutated_filename)
+    os.system(cmd1)
+    os.system(cmd2)
 
     unitigs_orig = read_unitigs(unitigs_orig_filename)
     unitigs_mutated = read_unitigs(unitigs_mutated_filename)
