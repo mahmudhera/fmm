@@ -490,13 +490,20 @@ def main3():
     # command: cuttlefish build -s <filename> -k <k> -t <thread_count> -o <out_filename> -w . --ref
     unitigs_orig_filename = orig_filename + '_unitigs'
     unitigs_mutated_filename = mut_filename + '_unitigs'
+
+    # remove files if they exist
+    if os.path.exists(unitigs_orig_filename+'.fa'):
+        os.remove(unitigs_orig_filename+'*')
+    if os.path.exists(unitigs_mutated_filename+'.fa'):
+        os.remove(unitigs_mutated_filename+'*')
+
     cmd1 = 'cuttlefish build -s {orig_filename} -k {k} -t 128 -o {unitigs_orig_filename} -w . --ref'.format(orig_filename=orig_filename, k=k, unitigs_orig_filename=unitigs_orig_filename)
     cmd2 = 'cuttlefish build -s {mut_filename} -k {k} -t 128 -o {unitigs_mutated_filename} -w . --ref'.format(mut_filename=mut_filename, k=k, unitigs_mutated_filename=unitigs_mutated_filename)
     os.system(cmd1)
     os.system(cmd2)
 
     unitigs_orig = read_unitigs(unitigs_orig_filename+'.fa')
-    unitigs_mutated = read_unitigs(unitigs_mutated_filename+'fa')
+    unitigs_mutated = read_unitigs(unitigs_mutated_filename+'.fa')
 
     # Sort the unitigs by length, small to large
     unitigs_mutated = sorted(list(unitigs_mutated), key=lambda x: len(x))
