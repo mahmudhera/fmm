@@ -313,15 +313,23 @@ tuple<double, double, double> estimate_rates_for_pair_of_files_by_kmers(string f
     // get all kmers of length k+1 in the original genome
     vector<string> kplusone_mers_orig = get_kmers(str_orig, k+1);
 
-    // estimate the number of kmers with single substitution and deletion
-    //pair<uint64_t, uint64_t> estimates = estimate_single_sub_del(kmers_orig, kplusone_mers_orig, kmers_mut);
+    // call the python script process_unitigs.py to get the estimates of S and D
+    // process_unitigs.py ndl_orig.fasta ndl_mutated.fasta 21 out_filename
+    // out_filename will contain the estimates of S and D in two lines
 
-    // estimate using estimate_S_D function
-    pair<size_t, size_t> estimates = estimate_S_D(str_orig, str_mut, k);
+    // execute the following command: python process_unitigs.py ndl_orig.fasta ndl_mutated.fasta 21 out_filename
+    string cmd = "python process_unitigs.py " + filename1 + " " + filename2 + " " + to_string(k) + " out_filename";
+    system(cmd.c_str());
+
+    // read the estimates from the file
+    ifstream file("out_filename");
+    uint64_t S, D;
+    file >> S;
+    file >> D;
 
     // extract them to variables
-    uint64_t num_kmer_single_subst = estimates.first;
-    uint64_t num_kmer_single_del = estimates.second;
+    uint64_t num_kmer_single_subst = S;
+    uint64_t num_kmer_single_del = D;
 
     // calculate the mutation rates
     tuple<double, double, double> rates = estimate_mut_rates(str_orig.size(), str_mut.size(), num_kmer_single_subst, num_kmer_single_del, count(str_orig.begin(), str_orig.end(), 'A'), count(str_mut.begin(), str_mut.end(), 'A'));
@@ -369,18 +377,21 @@ tuple<double, double, double> estimate_rates_for_pair_of_files_by_known_values(s
 
 // main function
 int main(int argc, char* argv[]) {
-    if (argc != 4) {
-        cout << "Usage: " << argv[0] << " <genome_name> <num_files> <kmer_len>" << endl;
+    if (argc != 5) {
+        cout << "Usage: " << argv[0] << " <genome_name> <num_files> <kmer_len> <output_filename>" << endl;
         return 1;
     }
 
     string genome_filename = argv[1];
     int num_files = stoi(argv[2]);
     int k = stoi(argv[3]);
+    string output_filename = argv[4];
 
     // create a vector of mutation rates, keeping the rates as strings
     vector<string> mutation_rates = {"0.01", "0.05", "0.1"};
 
+    // open output file
+    ofstream output_file(output_filename);
     
     for (string subst_rate : mutation_rates) {
         for (string del_rate : mutation_rates) {
@@ -388,13 +399,22 @@ int main(int argc, char* argv[]) {
                 for (int i = 0; i < num_files; i++) {
                     // use two decimal places for the rates
                     string filename = genome_filename + "_mutated_" + subst_rate + "_" + del_rate + "_" + ins_rate + "_" + to_string(k) + "_" + to_string(i) + ".fasta";
+                    
                     //cout << filename << endl;
                     tuple<double, double, double> rates_by_known_values = estimate_rates_for_pair_of_files_by_known_values(genome_filename, filename, k);
                     tuple<double, double, double> rates_by_kmers = estimate_rates_for_pair_of_files_by_kmers(genome_filename, filename, k);
+                    
                     // print: p_s, p_d, p_i, p_s_est1, p_d_est1, p_i_est1, p_s_est2, p_d_est2, p_i_est2
                     cout << subst_rate << " " << del_rate << " " << ins_rate << " ";
                     cout << get<0>(rates_by_known_values) << " " << get<2>(rates_by_known_values) << " " << get<1>(rates_by_known_values) << " ";
                     cout << get<0>(rates_by_kmers) << " " << get<2>(rates_by_kmers) << " " << get<1>(rates_by_kmers) << endl; 
+
+                    // append the rates to the output file
+                    output_file << subst_rate << " " << del_rate << " " << ins_rate << " ";
+                    output_file << get<0>(rates_by_known_values) << " " << get<2>(rates_by_known_values) << " " << get<1>(rates_by_known_values) << " ";
+                    output_file << get<0>(rates_by_kmers) << " " << get<2>(rates_by_kmers) << " " << get<1>(rates_by_kmers) << endl;
+
+                    
                 }
             }
         }
