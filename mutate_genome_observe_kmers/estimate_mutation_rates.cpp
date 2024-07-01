@@ -328,6 +328,7 @@ tuple<double, double, double> estimate_rates_for_pair_of_files_by_kmers(string f
 
     // execute the following command: python process_unitigs.py ndl_orig.fasta ndl_mutated.fasta 21 out_filename
     string cmd = "python process_unitigs.py " + filename1 + " " + filename2 + " " + to_string(k) + " out_filename";
+    cout << cmd << endl;
     system(cmd.c_str());
 
     // read the estimates from the file
