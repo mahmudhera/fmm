@@ -407,13 +407,6 @@ int main(int argc, char* argv[]) {
         for (string del_rate : mutation_rates) {
             for (string ins_rate : mutation_rates) {
                 for (int i = 0; i < num_files; i++) {
-
-                    // temporary convert subst rate to float
-                    float subst_rate_float = stof(subst_rate);
-                    if (subst_rate_float <= 0.05) {
-                        continue;
-                    }
-
                     // use two decimal places for the rates
                     string filename = genome_filename + "_mutated_" + subst_rate + "_" + del_rate + "_" + ins_rate + "_" + to_string(k) + "_" + to_string(i) + ".fasta";
                     
