@@ -400,7 +400,7 @@ int main(int argc, char* argv[]) {
 
                     // temporary convert subst rate to float
                     float subst_rate_float = stof(subst_rate);
-                    if (subst_rate_float <= 0.5) {
+                    if (subst_rate_float <= 0.05) {
                         continue;
                     }
 
