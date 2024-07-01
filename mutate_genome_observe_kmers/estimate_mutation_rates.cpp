@@ -277,25 +277,16 @@ tuple<double, double, double> estimate_mut_rates(int len_orig, int len_mut, int 
 
     val1 = 3.0 * (fA_mut - 1.0*L2/4.0) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  );
     val2 = 3.0 * (4.0 * S * fA_mut / (4.0*S + 3.0*D) - L2 * S / (4.0*S + 3.0*D) ) / (L - 4.0 * fA);
-    if (abs(val1 - val2) >= 1e-6) {
-        // raise error
-        throw runtime_error("Error: val1 and val2 are not equal");
-    }
+    assert(abs(val1 - val2) < 1e-6);
 
     val1 = 3.0 * (- fA + 1.0*L/4) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  );
     val2 = 3.0 * S / (4.0*S + 3.0*D);
-    if (abs(val1 - val2) >= 1e-6) {
-        // raise error
-        throw runtime_error("Error: val1 and val2 are not equal");
-    }
+    assert(abs(val1 - val2) < 1e-6);
 
     val1 = 3.0 * (fA_mut - fA + 1.0*L/4 - 1.0*L2/4) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  );
     val2 = 3.0 * (4.0 * S * fA_mut / (4.0*S + 3.0*D) - L2 * S / (4.0*S + 3.0*D) ) / (L - 4.0 * fA) 
                         + 3.0 * S / (4.0*S + 3.0*D);
-    if (abs(val1 - val2) >= 1e-6) {
-        // raise error
-        throw runtime_error("Error: val1 and val2 are not equal");
-    }
+    assert(abs(val1 - val2) < 1e-6);
     
 
     double subst_rate = 3.0 * (fA_mut - fA + 1.0*L/4 - 1.0*L2/4) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  );
@@ -328,7 +319,6 @@ tuple<double, double, double> estimate_rates_for_pair_of_files_by_kmers(string f
 
     // execute the following command: python process_unitigs.py ndl_orig.fasta ndl_mutated.fasta 21 out_filename
     string cmd = "python process_unitigs.py " + filename1 + " " + filename2 + " " + to_string(k) + " out_filename";
-    cout << cmd << endl;
     system(cmd.c_str());
 
     // read the estimates from the file
@@ -411,12 +401,8 @@ int main(int argc, char* argv[]) {
                     string filename = genome_filename + "_mutated_" + subst_rate + "_" + del_rate + "_" + ins_rate + "_" + to_string(k) + "_" + to_string(i) + ".fasta";
                     
                     //cout << filename << endl;
-                    // surround the following with try-catch block
-                    tuple<double, double, double> rates_by_known_values;
-                    tuple<double, double, double> rates_by_kmers;
-
-                    rates_by_known_values = estimate_rates_for_pair_of_files_by_known_values(genome_filename + ".fasta", filename, k);
-                    rates_by_kmers = estimate_rates_for_pair_of_files_by_kmers(genome_filename + ".fasta", filename, k);
+                    tuple<double, double, double> rates_by_known_values = estimate_rates_for_pair_of_files_by_known_values(genome_filename, filename, k);
+                    tuple<double, double, double> rates_by_kmers = estimate_rates_for_pair_of_files_by_kmers(genome_filename, filename, k);
                     
                     // print: p_s, p_d, p_i, p_s_est1, p_d_est1, p_i_est1, p_s_est2, p_d_est2, p_i_est2
                     cout << subst_rate << " " << del_rate << " " << ins_rate << " ";
