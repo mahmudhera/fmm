@@ -415,13 +415,13 @@ int main(int argc, char* argv[]) {
                     tuple<double, double, double> rates_by_known_values;
                     tuple<double, double, double> rates_by_kmers;
 
-                    try {
+                    //try {
                         rates_by_known_values = estimate_rates_for_pair_of_files_by_known_values(genome_filename + ".fasta", filename, k);
                         rates_by_kmers = estimate_rates_for_pair_of_files_by_kmers(genome_filename + ".fasta", filename, k);
-                    } catch (exception& e) {
-                        cout << "Error: " << e.what() << endl;
-                        continue;
-                    }
+                    //} catch (exception& e) {
+                        //cout << "Error: " << e.what() << endl;
+                        //continue;
+                    //}
 
                     
                     // print: p_s, p_d, p_i, p_s_est1, p_d_est1, p_i_est1, p_s_est2, p_d_est2, p_i_est2
