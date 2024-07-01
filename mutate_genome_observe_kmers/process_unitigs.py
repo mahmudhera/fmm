@@ -184,7 +184,7 @@ def main2():
 
 
 
-def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths_mutated, k, multiplier):
+def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths_mutated, k, multiplier, print_alignment=False):
     num_kmers_single_subst = 0
     num_kmers_single_delt = 0
     results = []
@@ -242,6 +242,12 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
         for i in range(num_chars-k+1):
             if sum(in_numbers[i:i+k]) == 1:
                 num_kmers_single_delt += 1
+
+        if print_alignment:
+            print(seqA)
+            print(seqB)
+            print(alignment.score)
+            print('----')
         
     results.append((num_kmers_single_subst, num_kmers_single_delt))
 
@@ -298,7 +304,13 @@ def main3():
     chunks = [unitigs_orig_list[i:i + chunk_size] for i in range(0, len(unitigs_orig), chunk_size)]
 
     pool = multiprocessing.Pool(num_cores)
-    results = pool.starmap(process_unitigs, [(chunk, unitigs_mutated, list_of_unitig_lengths_mutated, k, multiplier) for chunk in chunks])
+    args = []
+    for i, chunk in enumerate(chunks):
+        if i == 0:
+            args.append((chunk, unitigs_mutated, list_of_unitig_lengths_mutated, k, multiplier, True))
+        else:
+            args.append((chunk, unitigs_mutated, list_of_unitig_lengths_mutated, k, multiplier, False))
+    results = pool.starmap(process_unitigs, args)
 
     # Aggregate results
     num_kmers_single_subst = 0
