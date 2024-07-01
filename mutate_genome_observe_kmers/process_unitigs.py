@@ -298,6 +298,10 @@ def main3():
     # Divide the work among multiple processes
     num_cores = multiprocessing.cpu_count()
     num_cores = min(num_cores, len(unitigs_orig))
+
+    # debug
+    num_cores = 1
+
     chunk_size = len(unitigs_orig) // num_cores
     unitigs_orig_list = list(unitigs_orig)
     random.shuffle(unitigs_orig_list)
