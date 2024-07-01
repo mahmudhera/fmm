@@ -277,16 +277,25 @@ tuple<double, double, double> estimate_mut_rates(int len_orig, int len_mut, int 
 
     val1 = 3.0 * (fA_mut - 1.0*L2/4.0) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  );
     val2 = 3.0 * (4.0 * S * fA_mut / (4.0*S + 3.0*D) - L2 * S / (4.0*S + 3.0*D) ) / (L - 4.0 * fA);
-    assert(abs(val1 - val2) < 1e-6);
+    if (abs(val1 - val2) >= 1e-6) {
+        // raise error
+        throw runtime_error("Error: val1 and val2 are not equal");
+    }
 
     val1 = 3.0 * (- fA + 1.0*L/4) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  );
     val2 = 3.0 * S / (4.0*S + 3.0*D);
-    assert(abs(val1 - val2) < 1e-6);
+    if (abs(val1 - val2) >= 1e-6) {
+        // raise error
+        throw runtime_error("Error: val1 and val2 are not equal");
+    }
 
     val1 = 3.0 * (fA_mut - fA + 1.0*L/4 - 1.0*L2/4) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  );
     val2 = 3.0 * (4.0 * S * fA_mut / (4.0*S + 3.0*D) - L2 * S / (4.0*S + 3.0*D) ) / (L - 4.0 * fA) 
                         + 3.0 * S / (4.0*S + 3.0*D);
-    assert(abs(val1 - val2) < 1e-6);
+    if (abs(val1 - val2) >= 1e-6) {
+        // raise error
+        throw runtime_error("Error: val1 and val2 are not equal");
+    }
     
 
     double subst_rate = 3.0 * (fA_mut - fA + 1.0*L/4 - 1.0*L2/4) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  );
