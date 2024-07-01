@@ -124,13 +124,13 @@ def main2():
         high_index = min(len(unitigs_mutated)-1, high_index)
 
         for unitig2 in unitigs_mutated[low_index:high_index+1]:
-            alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
+            alignment = pairwise2.align.localms(unitig1, unitig2, 3, -1, -1, -1)[0]
             if alignment.score > best_match_score:
                 best_match_score = alignment.score
                 best_match_alignment = alignment
                 best_match_length = len(unitig2)
             unitig2 = reverse_complement(unitig2)
-            alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
+            alignment = pairwise2.align.localms(unitig1, unitig2, 3, -1, -1, -1)[0]
             if alignment.score > best_match_score:
                 best_match_score = alignment.score
                 best_match_alignment = alignment
@@ -206,13 +206,13 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
 
         for unitig2 in unitigs_mutated[low_index:high_index+1]:
         #for unitig2 in unitigs_mutated:
-            alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
+            alignment = pairwise2.align.localms(unitig1, unitig2, 3, -1, -1, -1)[0]
             if alignment.score > best_match_score:
                 best_match_score = alignment.score
                 best_match_alignment = alignment
 
             unitig2 = reverse_complement(unitig2)
-            alignment = pairwise2.align.globalms(unitig1, unitig2, 3, -1, -1, -1)[0]
+            alignment = pairwise2.align.localms(unitig1, unitig2, 3, -1, -1, -1)[0]
             if alignment.score > best_match_score:
                 best_match_score = alignment.score
                 best_match_alignment = alignment
@@ -253,10 +253,11 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
         # write alignment to file
         f.write(format_alignment(*alignment))
         f.write('--\n')
+        f.flush()
 
 
         
-        
+    f.close()
     results.append((num_kmers_single_subst, num_kmers_single_delt))
 
     return results
