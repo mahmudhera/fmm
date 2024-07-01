@@ -189,6 +189,8 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
     num_kmers_single_delt = 0
     results = []
 
+    f = open('log_alignments', 'w')
+
     for unitig1 in unitigs_orig_subset:
         best_match_score = -999999999
         best_match_alignment = None
@@ -244,10 +246,16 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
                 num_kmers_single_delt += 1
 
         if print_alignment:
-            print(seqA)
-            print(seqB)
-            print(alignment.score)
+            # show the alignment
+            print(format_alignment(*alignment))
             print('----')
+
+        # write alignment to file
+        f.write(format_alignment(*alignment))
+        f.write('--\n')
+
+
+        
         
     results.append((num_kmers_single_subst, num_kmers_single_delt))
 
