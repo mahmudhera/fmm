@@ -397,12 +397,29 @@ int main(int argc, char* argv[]) {
         for (string del_rate : mutation_rates) {
             for (string ins_rate : mutation_rates) {
                 for (int i = 0; i < num_files; i++) {
+
+                    // temporary convert subst rate to float
+                    float subst_rate_float = stof(subst_rate);
+                    if (subst_rate_float <= 0.5) {
+                        continue;
+                    }
+
                     // use two decimal places for the rates
                     string filename = genome_filename + "_mutated_" + subst_rate + "_" + del_rate + "_" + ins_rate + "_" + to_string(k) + "_" + to_string(i) + ".fasta";
                     
                     //cout << filename << endl;
-                    tuple<double, double, double> rates_by_known_values = estimate_rates_for_pair_of_files_by_known_values(genome_filename, filename, k);
-                    tuple<double, double, double> rates_by_kmers = estimate_rates_for_pair_of_files_by_kmers(genome_filename, filename, k);
+                    // surround the following with try-catch block
+                    tuple<double, double, double> rates_by_known_values;
+                    tuple<double, double, double> rates_by_kmers;
+
+                    try {
+                        rates_by_known_values = estimate_rates_for_pair_of_files_by_known_values(genome_filename + ".fasta", filename, k);
+                        rates_by_kmers = estimate_rates_for_pair_of_files_by_kmers(genome_filename + ".fasta", filename, k);
+                    } catch (exception& e) {
+                        cout << "Error: " << e.what() << endl;
+                        continue;
+                    }
+
                     
                     // print: p_s, p_d, p_i, p_s_est1, p_d_est1, p_i_est1, p_s_est2, p_d_est2, p_i_est2
                     cout << subst_rate << " " << del_rate << " " << ins_rate << " ";
