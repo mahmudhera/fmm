@@ -183,8 +183,8 @@ def main3():
     if os.path.exists(unitigs_mutated_filename+'.fa'):
         os.system('rm ' + unitigs_mutated_filename + '*')
 
-    cmd1 = 'cuttlefish build -s {orig_filename} -k {k} -t 128 -o {unitigs_orig_filename} -w . --ref'.format(orig_filename=orig_filename, k=k+10, unitigs_orig_filename=unitigs_orig_filename)
-    cmd2 = 'cuttlefish build -s {mut_filename} -k {k} -t 128 -o {unitigs_mutated_filename} -w . --ref'.format(mut_filename=mut_filename, k=k+10, unitigs_mutated_filename=unitigs_mutated_filename)
+    cmd1 = 'cuttlefish build -s {orig_filename} -k {k} -t 128 -o {unitigs_orig_filename} -w . --ref'.format(orig_filename=orig_filename, k=k+4, unitigs_orig_filename=unitigs_orig_filename)
+    cmd2 = 'cuttlefish build -s {mut_filename} -k {k} -t 128 -o {unitigs_mutated_filename} -w . --ref'.format(mut_filename=mut_filename, k=k+4, unitigs_mutated_filename=unitigs_mutated_filename)
     os.system(cmd1)
     os.system(cmd2)
 
