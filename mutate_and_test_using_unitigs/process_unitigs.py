@@ -147,7 +147,7 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
             if sum(in_numbers[i:i+k]) == 1:
                 num_kmers_single_delt += 1
 
-        all_alignments.append(alignment)
+        #all_alignments.append(alignment)
 
     results.append((num_kmers_single_subst, num_kmers_single_delt, all_alignments))
 
