@@ -1,0 +1,23 @@
+{
+    "parameters info": {
+        "input": "ndl_mutated.fasta",
+        "k": 21,
+        "output prefix": "ndl_mutated.fasta_unitigs"
+    },
+    "basic info": {
+        "vertex count": 114048,
+        "edge count": 114104
+    },
+    "contigs info": {
+        "maximal unitig count": 163,
+        "vertex count in the maximal unitigs": 114048,
+        "shortest maximal unitig length": 21,
+        "longest maximal unitig length": 6320,
+        "sum maximal unitig length": 117308,
+        "avg. maximal unitig length": 720,
+        "_comment": "lengths are in bases"
+    },
+    "detached chordless cycles (DCC) info": {
+        "DCC count": 0
+    }
+}
