@@ -87,12 +87,11 @@ def find_index(sorted_list, query):
 
 
 
-def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths_mutated, k, multiplier, print_alignment=False):
+def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths_mutated, k, multiplier):
     num_kmers_single_subst = 0
     num_kmers_single_delt = 0
     results = []
-
-    f = open('log_alignments', 'w')
+    all_alignments = []
 
     for unitig1 in unitigs_orig_subset:
         best_match_score = -999999999
@@ -148,20 +147,9 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
             if sum(in_numbers[i:i+k]) == 1:
                 num_kmers_single_delt += 1
 
-        if print_alignment:
-            # show the alignment
-            print(format_alignment(*alignment))
-            print('----')
+        all_alignments.append(alignment)
 
-        # write alignment to file
-        f.write(format_alignment(*alignment))
-        f.write('--\n')
-        f.flush()
-
-
-        
-    f.close()
-    results.append((num_kmers_single_subst, num_kmers_single_delt))
+    results.append((num_kmers_single_subst, num_kmers_single_delt, all_alignments))
 
     return results
 
@@ -211,9 +199,6 @@ def main3():
     num_cores = multiprocessing.cpu_count()
     num_cores = min(num_cores, len(unitigs_orig))
 
-    # debug
-    num_cores = 1
-
     chunk_size = len(unitigs_orig) // num_cores
     unitigs_orig_list = list(unitigs_orig)
     random.shuffle(unitigs_orig_list)
@@ -222,19 +207,21 @@ def main3():
     pool = multiprocessing.Pool(num_cores)
     args = []
     for i, chunk in enumerate(chunks):
-        if i == 0:
-            args.append((chunk, unitigs_mutated, list_of_unitig_lengths_mutated, k, multiplier, True))
-        else:
-            args.append((chunk, unitigs_mutated, list_of_unitig_lengths_mutated, k, multiplier, False))
+        args.append((chunk, unitigs_mutated, list_of_unitig_lengths_mutated, k, multiplier))
     results = pool.starmap(process_unitigs, args)
 
     # Aggregate results
+    f = open('alignments', 'w')
     num_kmers_single_subst = 0
     num_kmers_single_delt = 0
     for result in results:
-        for subst, delt in result:
+        for subst, delt, alignment in result:
             num_kmers_single_subst += subst
             num_kmers_single_delt += delt
+            for a in alignment:
+                f.write(format_alignment(*a))
+                f.write('\n')
+    f.close()
 
     # Write results to output file
     with open(output_filename, 'w') as f:
