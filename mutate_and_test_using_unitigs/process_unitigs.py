@@ -92,6 +92,7 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
     num_kmers_single_delt = 0
     results = []
     all_alignments = []
+    kmers_marked_for_subst = []
 
     for unitig1 in unitigs_orig_subset:
         best_match_score = -999999999
@@ -135,6 +136,7 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
         for i in range(num_chars-k+1):
             if sum(in_numbers[i:i+k]) == 1:
                 num_kmers_single_subst += 1
+                kmers_marked_for_subst.append(seqA[i:i+k])
 
         in_numbers = [0 for i in range(num_chars)]
         for i in range(num_chars):
@@ -149,7 +151,7 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
 
         all_alignments.append(format_alignment(*alignment))
 
-    results.append((num_kmers_single_subst, num_kmers_single_delt, all_alignments))
+    results.append((num_kmers_single_subst, num_kmers_single_delt, all_alignments, kmers_marked_for_subst))
 
     return results
 
@@ -215,16 +217,21 @@ def main3():
 
     # Aggregate results
     f = open('alignments', 'w')
+    f2 = open('substitution_kmers', 'w')
     num_kmers_single_subst = 0
     num_kmers_single_delt = 0
     for result in results:
-        for subst, delt, alignment in result:
+        for subst, delt, alignment, kmers_subst in result:
             num_kmers_single_subst += subst
             num_kmers_single_delt += delt
             for a in alignment:
                 f.write(a)
                 f.write('\n\n')
+            for kmer in kmers_subst:
+                f2.write(kmer)
+                f2.write('\n')
     f.close()
+    f2.close()
 
     # Write results to output file
     with open(output_filename, 'w') as f:
