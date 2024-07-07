@@ -147,7 +147,7 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
             if sum(in_numbers[i:i+k]) == 1:
                 num_kmers_single_delt += 1
 
-        #all_alignments.append(alignment)
+        all_alignments.append(alignment)
 
     results.append((num_kmers_single_subst, num_kmers_single_delt, all_alignments))
 
@@ -210,6 +210,9 @@ def main3():
         args.append((chunk, unitigs_mutated, list_of_unitig_lengths_mutated, k, multiplier))
     results = pool.starmap(process_unitigs, args)
 
+    print('Done, now aggregating results'
+          ' and writing to output file')
+
     # Aggregate results
     f = open('alignments', 'w')
     num_kmers_single_subst = 0
@@ -219,6 +222,7 @@ def main3():
             num_kmers_single_subst += subst
             num_kmers_single_delt += delt
             for a in alignment:
+                print(format_alignment(*a))
                 f.write(format_alignment(*a))
                 f.write('\n')
     f.close()
