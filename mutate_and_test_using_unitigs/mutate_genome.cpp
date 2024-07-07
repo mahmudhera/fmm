@@ -117,15 +117,15 @@ public:
             }
             if (sum1 == 3 && sum2 == 0) {
                 num_kmers_single_deletion++;
-                kmers_with_single_deletion.insert(final_str.substr(i, k));
+                kmers_with_single_deletion.insert(this->orig_string.substr(i, k));
             }
             if (sum1 == 2 && sum2 == 0) {
                 num_kmers_single_substitution++;
-                kmers_with_single_substitution.insert(final_str.substr(i, k));
+                kmers_with_single_substitution.insert(this->orig_string.substr(i, k));
             }
             if (sum1 == 0 && sum2 == 1) {
                 num_kmers_single_insertion++;
-                kmers_with_single_insertion.insert(final_str.substr(i, k));
+                kmers_with_single_insertion.insert(this->orig_string.substr(i, k));
             }
             if (sum1 == 0 && sum2 == 0) {
                 num_kmers_no_mutation++;
