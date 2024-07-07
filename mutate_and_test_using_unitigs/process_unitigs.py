@@ -149,7 +149,7 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
             if sum(in_numbers[i:i+k]) == 1:
                 num_kmers_single_delt += 1
 
-        all_alignments.append(format_alignment(*alignment))
+        all_alignments.append((unitig1, format_alignment(*alignment)))
 
     results.append((num_kmers_single_subst, num_kmers_single_delt, all_alignments, kmers_marked_for_subst))
 
@@ -224,7 +224,9 @@ def main3():
         for subst, delt, alignment, kmers_subst in result:
             num_kmers_single_subst += subst
             num_kmers_single_delt += delt
-            for a in alignment:
+            for u, a in alignment:
+                f.write(u)
+                f.write('\n')
                 f.write(a)
                 f.write('\n\n')
             for kmer in kmers_subst:
