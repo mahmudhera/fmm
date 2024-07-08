@@ -184,15 +184,18 @@ def main3():
     unitigs_orig_filename = orig_filename + '_unitigs'
     unitigs_mutated_filename = mut_filename + '_unitigs'
 
-    # remove files if they exist
-    if os.path.exists(unitigs_orig_filename+'.fa'):
-        os.system('rm ' + unitigs_orig_filename + '*')
-    if os.path.exists(unitigs_mutated_filename+'.fa'):
-        os.system('rm ' + unitigs_mutated_filename + '*')
-
     if run_cuttlefish:
+        # remove files if they exist
+        if os.path.exists(unitigs_orig_filename+'.fa'):
+            os.system('rm ' + unitigs_orig_filename + '*')
+        if os.path.exists(unitigs_mutated_filename+'.fa'):
+            os.system('rm ' + unitigs_mutated_filename + '*')
+        
+        # generate the commands
         cmd1 = 'cuttlefish build -s {orig_filename} -k {k} -t 128 -o {unitigs_orig_filename} -w . --ref'.format(orig_filename=orig_filename, k=k, unitigs_orig_filename=unitigs_orig_filename)
         cmd2 = 'cuttlefish build -s {mut_filename} -k {k} -t 128 -o {unitigs_mutated_filename} -w . --ref'.format(mut_filename=mut_filename, k=k, unitigs_mutated_filename=unitigs_mutated_filename)
+        
+        # execute the commands
         os.system(cmd1)
         os.system(cmd2)
 
