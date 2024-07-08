@@ -166,13 +166,18 @@ def main3():
     parser.add_argument('k', type=int, help='Length of k-mers')
     parser.add_argument('o', type=str, help='Output filename')
 
+    # add an optional argument to indicate whether we need to run cuttlefish or not
+    parser.add_argument('--run_cuttlefish', action='store_true', help='Run cuttlefish to generate unitigs')
+    
     args = parser.parse_args()
+
 
     orig_filename = args.orig_filename
     mut_filename = args.mut_filename
     k = args.k
     output_filename = args.o
     multiplier = 3.0
+    run_cuttlefish = args.run_cuttlefish
 
     # invoke cuttlefish2 with the files and generate the unitigs
     # command: cuttlefish build -s <filename> -k <k> -t <thread_count> -o <out_filename> -w . --ref
@@ -185,10 +190,11 @@ def main3():
     if os.path.exists(unitigs_mutated_filename+'.fa'):
         os.system('rm ' + unitigs_mutated_filename + '*')
 
-    cmd1 = 'cuttlefish build -s {orig_filename} -k {k} -t 128 -o {unitigs_orig_filename} -w . --ref'.format(orig_filename=orig_filename, k=k, unitigs_orig_filename=unitigs_orig_filename)
-    cmd2 = 'cuttlefish build -s {mut_filename} -k {k} -t 128 -o {unitigs_mutated_filename} -w . --ref'.format(mut_filename=mut_filename, k=k, unitigs_mutated_filename=unitigs_mutated_filename)
-    os.system(cmd1)
-    os.system(cmd2)
+    if run_cuttlefish:
+        cmd1 = 'cuttlefish build -s {orig_filename} -k {k} -t 128 -o {unitigs_orig_filename} -w . --ref'.format(orig_filename=orig_filename, k=k, unitigs_orig_filename=unitigs_orig_filename)
+        cmd2 = 'cuttlefish build -s {mut_filename} -k {k} -t 128 -o {unitigs_mutated_filename} -w . --ref'.format(mut_filename=mut_filename, k=k, unitigs_mutated_filename=unitigs_mutated_filename)
+        os.system(cmd1)
+        os.system(cmd2)
 
     unitigs_orig = read_unitigs(unitigs_orig_filename+'.fa')
     unitigs_mutated = read_unitigs(unitigs_mutated_filename+'.fa')
