@@ -17,6 +17,25 @@ import random
 import argparse
 import os
 
+
+def filter_by_length_percentage(unitigs_list, cut_off):
+    lengths = [ len(u) for u in unitigs_list ]
+    sum_of_lengths = sum(lengths)
+    lengths.sort(reverse=True)
+    cut_off_cumulative = cut_off * sum_of_lengths
+    cumu = 0
+    for l in lengths:
+        cut_off_length = l
+        cumu += l
+        if cumu >= cut_off_cumulative:
+            break
+    return_list = []
+    for u in unitigs_list:
+        if len(u) >= cut_off_length:
+            return_list.append(u)
+    return return_list
+
+
 alphabet = set('ACGT')
 
 def reverse_complement(kmer):
@@ -94,7 +113,7 @@ def process_unitigs(unitigs_orig_subset, unitigs_mutated, list_of_unitig_lengths
     all_alignments = []
     kmers_marked_for_subst = []
 
-    for unitig1 in unitigs_orig_subset:
+    for num_processed, unitig1 in enumerate(unitigs_orig_subset):
         best_match_score = -999999999
         best_match_alignment = None
 
@@ -168,6 +187,7 @@ def main3():
 
     # add an optional argument to indicate whether we need to run cuttlefish or not
     parser.add_argument('--run_cuttlefish', action='store_true', help='Run cuttlefish to generate unitigs')
+    parser.add_argument('--cut_off', type=float, default=1.0, help='Cut off value for the length to be considered')
     
     args = parser.parse_args()
 
@@ -178,6 +198,7 @@ def main3():
     output_filename = args.o
     multiplier = 3.0
     run_cuttlefish = args.run_cuttlefish
+    cut_off = args.cut_off
 
     # invoke cuttlefish2 with the files and generate the unitigs
     # command: cuttlefish build -s <filename> -k <k> -t <thread_count> -o <out_filename> -w . --ref
@@ -201,6 +222,11 @@ def main3():
 
     unitigs_orig = read_unitigs(unitigs_orig_filename+'.fa')
     unitigs_mutated = read_unitigs(unitigs_mutated_filename+'.fa')
+    
+    # filter all unitigs by cut-off
+    unitigs_orig = filter_by_length_percentage(unitigs_orig, cut_off)
+    unitigs_mutated = filter_by_length_percentage(unitigs_mutated, cut_off)
+    # scale later
 
     # Sort the unitigs by length, small to large
     unitigs_mutated = sorted(list(unitigs_mutated), key=lambda x: len(x))
@@ -243,6 +269,10 @@ def main3():
                 f2.write('\n')
     f.close()
     f2.close()
+    
+    # scale by inverse of cut_off
+    num_kmers_single_subst = num_kmers_single_subst/cut_off
+    num_kmers_single_delt = num_kmers_single_delt/cut_off
 
     # Write results to output file
     with open(output_filename, 'w') as f:

@@ -104,9 +104,9 @@ public:
         size_t num_kmers_no_mutation = 0;
 
         // sets for kmers
-        set<string> kmers_with_single_insertion;
-        set<string> kmers_with_single_deletion;
-        set<string> kmers_with_single_substitution;
+        set<pair<string, string>> kmers_with_single_insertion;
+        set<pair<string, string>> kmers_with_single_deletion;
+        set<pair<string, string>> kmers_with_single_substitution;
 
         for (size_t i = 0; i < orig_length - k + 1; i++) {
             int sum1 = 0;
@@ -117,15 +117,36 @@ public:
             }
             if (sum1 == 3 && sum2 == 0) {
                 num_kmers_single_deletion++;
-                kmers_with_single_deletion.insert(this->orig_string.substr(i, k));
+                string corresponding_mut_kmer = "";
+                for (int ii = 0; ii < k; ii++) {
+                    if (new_string[ii] != ' ') {
+                        corresponding_mut_kmer = corresponding_mut_kmer + new_string[ii];
+                    }
+                    corresponding_mut_kmer += corresponding_mut_kmer + strings_to_insert[ii];
+                }
+                kmers_with_single_deletion.insert(make_pair(this->orig_string.substr(i, k), corresponding_mut_kmer));
             }
             if (sum1 == 2 && sum2 == 0) {
                 num_kmers_single_substitution++;
-                kmers_with_single_substitution.insert(this->orig_string.substr(i, k));
+                string corresponding_mut_kmer = "";
+                for (int ii = 0; ii < k; ii++) {
+                    if (new_string[ii] != ' ') {
+                        corresponding_mut_kmer = corresponding_mut_kmer + new_string[ii];
+                    }
+                    corresponding_mut_kmer += corresponding_mut_kmer + strings_to_insert[ii];
+                }
+                kmers_with_single_substitution.insert(make_pair(this->orig_string.substr(i, k), corresponding_mut_kmer));
             }
             if (sum1 == 0 && sum2 == 1) {
                 num_kmers_single_insertion++;
-                kmers_with_single_insertion.insert(this->orig_string.substr(i, k));
+                string corresponding_mut_kmer = "";
+                for (int ii = 0; ii < k; ii++) {
+                    if (new_string[ii] != ' ') {
+                        corresponding_mut_kmer = corresponding_mut_kmer + new_string[ii];
+                    }
+                    corresponding_mut_kmer += corresponding_mut_kmer + strings_to_insert[ii];
+                }
+                kmers_with_single_insertion.insert(make_pair(this->orig_string.substr(i, k), corresponding_mut_kmer));
             }
             if (sum1 == 0 && sum2 == 0) {
                 num_kmers_no_mutation++;
