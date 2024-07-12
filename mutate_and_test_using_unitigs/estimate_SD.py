@@ -1,8 +1,8 @@
 import sys
 
-from read_genome import read_genome
-from read_genome import clean_genome_string
-from read_genome import get_kmers
+from process_unitigs import read_genome
+from process_unitigs import clean_genome_string
+from process_unitigs import get_kmers
 
 
 def estimate_S_D(genome_string, mutated_genome_string, k):
