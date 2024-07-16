@@ -57,3 +57,7 @@ def main():
 
             # show these values
             print("True S D I N values:", ps, pd, d, i, S, D, I, N)
+
+
+if __name__ == "__main__":
+    main()
