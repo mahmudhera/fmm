@@ -2,7 +2,7 @@ import argparse
 from create_random import create_random_genome
 from itertools import product
 from tqdm import tqdm
-from mutate_genome import mutate_genome
+from mutate_genome import mutate as mutate_genome
 from genome_readers import read_true_SDIN_values
 import numpy as np
 
