@@ -45,7 +45,7 @@ def main():
     run_cuttlefish(args.genome_filename, args.k, 64, cuttlefish_prefix)
     unitigs_file = cuttlefish_prefix + '.fa'
 
-    assert os.path.exists(unitigs_file), "Unitigs file not found"
+    assert os.path.exists(unitigs_file), f"Unitigs file {unitigs_file} not found"
 
     mutation_rates = [round(x, 2) for x in list( np.arange(args.ps_start, args.ps_end, args.ps_step) )]
     num_simulations = args.num_simulations
