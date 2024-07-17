@@ -139,6 +139,9 @@ def parse_args():
     # argument for the number of simulations
     parser.add_argument("--num_simulations", type=int, help="The number of simulations", default=10)
 
+    # argument for output filename
+    parser.add_argument("--output_filename", help="The output filename")
+
     return parser.parse_args()
 
 def main():
@@ -159,6 +162,9 @@ def main():
     mutation_rates = [round(x, 2) for x in list( np.arange(args.ps_start, args.ps_end, args.ps_step) )]
     num_simulations = args.num_simulations
     genome_file_prefix = args.genome_filename.split('.')[0]
+
+    # open the output file
+    f = open(args.output_filename, "w")
 
     for ps, pd, d in tqdm(list(product(mutation_rates, repeat=3))):
         for i in range(num_simulations):
@@ -185,8 +191,10 @@ def main():
             # run the alignment based approach to get an estimate of S D I N
             S_est, D_est, I_est, N_est = compute_S_D_I_N_all(unitigs_orig, unitigs_mut, args.k)
 
-            # show these values
+            # write these values to the output file
+            f.write(f"{ps} {pd} {d} {i} {S} {D} {I} {N} {S_est} {D_est} {I_est} {N_est}\n")
             print("True S D I N values:", ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est)
+        f.flush()
 
 
 if __name__ == "__main__":
