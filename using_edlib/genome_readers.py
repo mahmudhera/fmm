@@ -11,7 +11,7 @@ def read_genome(genome_file):
     genome = ""
     for record in SeqIO.parse(genome_file, "fasta"):
         genome += str(record.seq)
-    return genome
+    return clean_genome_string(genome)
 
 def clean_genome_string(genome_string):
     """
@@ -19,7 +19,14 @@ def clean_genome_string(genome_string):
     """
     alphabet = set('ACGT')
     return ''.join(filter(alphabet.__contains__, genome_string))
-                   
+
+def get_genome_length(genome_filename):
+    """
+    Returns the length of the genome in the genome file
+    """
+    genome = read_genome(genome_filename)
+    return len(clean_genome_string(genome))
+
 def get_kmers(genome_string, k):
     """
     Returns a list of all k-mers in a genome string

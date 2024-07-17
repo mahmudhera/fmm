@@ -3,7 +3,7 @@ from create_random import create_random_genome
 from itertools import product
 from tqdm import tqdm
 from mutate_genome import mutate as mutate_genome
-from genome_readers import read_true_SDIN_values, reverse_complement, read_unitigs
+from genome_readers import read_true_SDIN_values, reverse_complement, read_unitigs, read_genome
 import numpy as np
 import os
 from run_cuttlefish import run_cuttlefish
@@ -114,6 +114,64 @@ def compute_S_D_I_N_all(unitig_set_orig, unitig_set_mutd, k, num_threads = 64):
 
 
 
+def estimate_rates(L, L2, S, D, fA, fA_mut):
+    val1 = 3.0 * (fA_mut - 1.0*L2/4.0) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  )
+    val2 = 3.0 * (4.0 * S * fA_mut / (4.0*S + 3.0*D) - L2 * S / (4.0*S + 3.0*D) ) / (L - 4.0 * fA)
+    assert abs(val1 - val2) < 1e-6
+
+    val1 = 3.0 * (- fA + 1.0*L/4) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  )
+    val2 = 3.0 * S / (4.0*S + 3.0*D)
+    assert abs(val1 - val2) < 1e-6
+
+    val1 = 3.0 * (fA_mut - fA + 1.0*L/4 - 1.0*L2/4) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  )
+    val2 = 3.0 * (4.0 * S * fA_mut / (4.0*S + 3.0*D) - L2 * S / (4.0*S + 3.0*D) ) / (L - 4.0 * fA)  + 3.0 * S / (4.0*S + 3.0*D)
+    assert abs(val1 - val2) < 1e-6
+
+    subst_rate = 3.0 * (fA_mut - fA + 1.0*L/4 - 1.0*L2/4) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  )
+    del_rate = 1.0 * D * subst_rate / S
+    ins_rate = 1.0 * L2 / L - 1.0 + del_rate
+
+    return subst_rate, del_rate, ins_rate
+
+
+
+def perform_one_iteration(genome_file_prefix, ps, pd, d, i, args, unitigs_file_orig, L, fA):
+    # create the mutated genome file using these mutation rates. args = genome_filename, ps, pd, d, seed, output_filename, k
+    mutated_filename = genome_file_prefix + "_mutated_" + str(ps) + "_" + str(pd) + "_" + str(d) + "_" + str(i) + ".fasta"
+    
+    # if this file already exists, skip this simulation
+    if not os.path.exists(mutated_filename):
+        mutate_genome(args.genome_filename, ps, pd, d, i, mutated_filename, args.k)
+
+    # read the mutated genome file
+    mutated_string = read_genome(mutated_filename)
+    L2 = len(mutated_string)
+    fA_mut = mutated_string.count('A')
+
+    # read true S D I N values from the mutated genome file
+    S, D, I, N = read_true_SDIN_values(mutated_filename)
+
+    # run cuttlefish on the mutated genome file to generate the unitigs file, store the name of the unitigs file
+    if not os.path.exists(mutated_unitigs_file):
+        mutated_cuttlefish_prefix = mutated_filename + '_unitigs'
+        run_cuttlefish(mutated_filename, args.k, 64, mutated_cuttlefish_prefix)
+        mutated_unitigs_file = mutated_cuttlefish_prefix + '.fa'
+
+    assert os.path.exists(mutated_unitigs_file), f"Mutated unitigs file {mutated_unitigs_file} not found"
+
+    # read two sets of unitigs
+    unitigs_orig, unitigs_mut = read_unitigs(unitigs_file_orig), read_unitigs(mutated_unitigs_file)
+
+    # run the alignment based approach to get an estimate of S D I N
+    S_est, D_est, I_est, N_est = compute_S_D_I_N_all(unitigs_orig, unitigs_mut, args.k)
+
+    # estimate the mutation rates
+    subst_rate, del_rate, ins_rate = estimate_rates(L, L2, S, D, fA, fA_mut)
+
+    # estimate the mutation rates using estimated S and D
+    subst_rate_est, del_rate_est, ins_rate_est = estimate_rates(L, L2, S_est, D_est, fA, fA_mut)
+
+    return ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est, subst_rate, del_rate, ins_rate, subst_rate_est, del_rate_est, ins_rate_est
 
 
 
@@ -140,9 +198,12 @@ def parse_args():
     parser.add_argument("--num_simulations", type=int, help="The number of simulations", default=10)
 
     # argument for output filename
-    parser.add_argument("--output_filename", help="The output filename")
+    parser.add_argument("--output_observations", help="The output filename containing S D I N observations")
+    parser.add_argument("--output_rates", help="The output filename containing estimated rates")
 
     return parser.parse_args()
+
+
 
 def main():
     # parse the arguments
@@ -163,38 +224,39 @@ def main():
     num_simulations = args.num_simulations
     genome_file_prefix = args.genome_filename.split('.')[0]
 
-    # open the output file
-    f = open(args.output_filename, "w")
+    genome_string = read_genome(args.genome_filename)
+    L = len(genome_string)
+    fA = genome_string.count('A') 
 
-    for ps, pd, d in tqdm(list(product(mutation_rates, repeat=3))):
+    # open the output files
+    f = open(args.output_observations, "w")
+    f.write("ps pd d i S D I N S_est D_est I_est N_est\n")
+    f2 = open(args.output_rates, "w")
+    f2.write("ps pd d i subst_rate del_rate ins_rate subst_rate_est del_rate_est ins_rate_est\n")  
+
+    num_threads = 128
+    pool_main = Pool(num_threads)  
+
+    arg_list = []
+    for ps, pd, d in product(mutation_rates, repeat=3):
         for i in range(num_simulations):
-            # create the mutated genome file using these mutation rates. args = genome_filename, ps, pd, d, seed, output_filename, k
-            mutated_filename = genome_file_prefix + "_mutated_" + str(ps) + "_" + str(pd) + "_" + str(d) + "_" + str(i) + ".fasta"
-            
-            # if this file already exists, skip this simulation
-            if not os.path.exists(mutated_filename):
-                mutate_genome(args.genome_filename, ps, pd, d, i, mutated_filename, args.k)
+            arg_list.append((genome_file_prefix, ps, pd, d, i, args, unitigs_file, L, fA))
 
-            # read true S D I N values from the mutated genome file
-            S, D, I, N = read_true_SDIN_values(mutated_filename)
+    results = pool_main.starmap(perform_one_iteration, tqdm(arg_list))
+    pool_main.close()
 
-            # run cuttlefish on the mutated genome file to generate the unitigs file, store the name of the unitigs file
-            mutated_cuttlefish_prefix = mutated_filename + '_unitigs'
-            run_cuttlefish(mutated_filename, args.k, 64, mutated_cuttlefish_prefix)
-            mutated_unitigs_file = mutated_cuttlefish_prefix + '.fa'
+    for res in results:
+        ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est, subst_rate, del_rate, ins_rate, subst_rate_est, del_rate_est, ins_rate_est = res
+        # write these values to the output file
+        f.write(f"{ps} {pd} {d} {i} {S} {D} {I} {N} {S_est} {D_est} {I_est} {N_est}\n")
+        print("True S D I N values:", ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est)
 
-            assert os.path.exists(mutated_unitigs_file), f"Mutated unitigs file {mutated_unitigs_file} not found"
+        # write these values to the output file
+        f2.write(f"{ps} {pd} {d} {i} {subst_rate} {del_rate} {ins_rate} {subst_rate_est} {del_rate_est} {ins_rate_est}\n")
+        print("Estimated rates:", ps, pd, d, i, subst_rate, del_rate, ins_rate, subst_rate_est, del_rate_est, ins_rate_est)
 
-            # read two sets of unitigs
-            unitigs_orig, unitigs_mut = read_unitigs(unitigs_file), read_unitigs(mutated_unitigs_file)
-
-            # run the alignment based approach to get an estimate of S D I N
-            S_est, D_est, I_est, N_est = compute_S_D_I_N_all(unitigs_orig, unitigs_mut, args.k)
-
-            # write these values to the output file
-            f.write(f"{ps} {pd} {d} {i} {S} {D} {I} {N} {S_est} {D_est} {I_est} {N_est}\n")
-            print("True S D I N values:", ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est)
         f.flush()
+        f2.flush()
 
 
 if __name__ == "__main__":
