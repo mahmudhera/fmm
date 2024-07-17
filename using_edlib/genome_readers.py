@@ -1,5 +1,9 @@
 from Bio import SeqIO
 
+def reverse_complement(seq):
+    complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
+    return ''.join([complement[base] for base in reversed(seq)])
+
 def read_genome(genome_file):
     """
     Reads a genome file and returns the genome as a string

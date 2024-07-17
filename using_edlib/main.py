@@ -3,10 +3,119 @@ from create_random import create_random_genome
 from itertools import product
 from tqdm import tqdm
 from mutate_genome import mutate as mutate_genome
-from genome_readers import read_true_SDIN_values
+from genome_readers import read_true_SDIN_values, reverse_complement, read_unitigs
 import numpy as np
 import os
 from run_cuttlefish import run_cuttlefish
+from multiprocessing import Pool
+
+import edlib
+
+
+
+def compute_S_D_I_N(u1, unitig_set_mutd, k):
+    
+    num_kmers_single_subst, num_kmers_single_delt, num_kmers_no_mutation = 0, 0, 0
+    num_kmers_single_insertion = 0
+    k = 21
+
+    for u2 in unitig_set_mutd:
+        alignment, distance, st1, st2 = None, 9999999999, None, None
+        
+        r1 = edlib.align(u1, u2, mode = "HW", task = "path")
+        r2 = edlib.align(u2, u1, mode = "HW", task = "path")
+        
+        u3 = reverse_complement(u1)
+        r3 = edlib.align(u3, u2, mode = "HW", task = "path")
+        r4 = edlib.align(u2, u3, mode = "HW", task = "path")
+        
+        for i, r in enumerate([r1, r2, r3, r4]):
+            if r['editDistance'] < distance:
+                alignment, distance = r, r['editDistance']
+                if i == 0:
+                    st1, st2 = u1, u2
+                    flip = False
+                elif i == 1:
+                    st1, st2 = u2, u1
+                    flip = True
+                elif i == 2:
+                    st1, st2 = u3, u2
+                    flip = False
+                else:
+                    st1, st2 = u2, u3
+                    flip = True
+        
+        nice = edlib.getNiceAlignment(alignment, st1, st2)
+        seqA, seqB = nice['query_aligned'], nice['target_aligned']
+        assert len(seqA) == len(seqB)
+        
+        if flip:
+            seqB, seqA = seqA, seqB
+            
+        alphabet = set('ACGT')
+        num_chars = len(seqA)
+        in_numbers = [0 for i in range(num_chars)]
+        for i in range(num_chars):
+            if seqA[i] != seqB[i]:
+                if seqA[i] in alphabet and seqB[i] in alphabet:
+                    in_numbers[i] = 1
+                else:
+                    in_numbers[i] = 2
+
+        for i in range(num_chars-k+1):
+            if sum(in_numbers[i:i+k]) == 1:
+                num_kmers_single_subst += 1
+
+        in_numbers = [0 for i in range(num_chars)]
+        for i in range(num_chars):
+            if seqB[i] == '-' and seqA[i] in alphabet:
+                in_numbers[i] = 1
+            elif seqA[i] != seqB[i]:
+                in_numbers[i] = 2
+
+        for i in range(num_chars-k+1):
+            if sum(in_numbers[i:i+k]) == 1:
+                num_kmers_single_delt += 1
+            if sum(in_numbers[i:i+k]) == 0:
+                num_kmers_no_mutation += 1
+        
+        in_numbers = [0 for i in range(num_chars)]
+        for i in range(num_chars):
+            if seqB[i] in alphabet and seqA[i] == '-':
+                in_numbers[i] = 1
+            elif seqA[i] != seqB[i]:
+                in_numbers[i] = 2
+
+        for i in range(num_chars-k+1):
+            if sum(in_numbers[i:i+k]) == 1:
+                num_kmers_single_insertion += 1
+                    
+                    
+    return num_kmers_single_subst, num_kmers_single_delt, num_kmers_single_insertion, num_kmers_no_mutation
+
+
+
+def compute_S_D_I_N_all(unitig_set_orig, unitig_set_mutd, k, num_threads = 64):
+    # call compute_S_D_I_N using a multiprocessing pool
+    # return the sum of all the values
+    pool = Pool(num_threads)
+    arg_list = [(u1, unitig_set_mutd, k) for u1 in unitig_set_orig]
+    results = pool.starmap(compute_S_D_I_N, arg_list)
+    pool.close()
+
+    S, D, I, N = 0, 0, 0, 0
+    for S_, D_, I_, N_ in results:
+        S += S_
+        D += D_
+        I += I_
+        N += N_
+
+    return S, D, I, N
+
+
+
+
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Check if by using alignments, we can get a good estimate of S D I N")
@@ -71,11 +180,13 @@ def main():
             assert os.path.exists(mutated_unitigs_file), f"Mutated unitigs file {mutated_unitigs_file} not found"
 
             # read two sets of unitigs
+            unitigs_orig, unitigs_mut = read_unitigs(unitigs_file), read_unitigs(mutated_unitigs_file)
 
             # run the alignment based approach to get an estimate of S D I N
+            S_est, D_est, I_est, N_est = compute_S_D_I_N_all(unitigs_orig, unitigs_mut, args.k)
 
             # show these values
-            print("True S D I N values:", ps, pd, d, i, S, D, I, N)
+            print("True S D I N values:", ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est)
 
 
 if __name__ == "__main__":
