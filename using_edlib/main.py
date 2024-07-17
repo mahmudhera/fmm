@@ -179,7 +179,7 @@ def perform_one_iteration(genome_file_prefix, ps, pd, d, i, args, unitigs_file_o
     unitigs_orig, unitigs_mut = read_unitigs(unitigs_file_orig), read_unitigs(mutated_unitigs_file)
 
     # run the alignment based approach to get an estimate of S D I N
-    S_est, D_est, I_est, N_est = compute_S_D_I_N_all(unitigs_orig, unitigs_mut, args.k)
+    S_est, D_est, I_est, N_est = compute_S_D_I_N_single_threaded(unitigs_orig, unitigs_mut, args.k)
 
     # estimate the mutation rates
     subst_rate, del_rate, ins_rate = estimate_rates(L, L2, S, D, fA, fA_mut)
