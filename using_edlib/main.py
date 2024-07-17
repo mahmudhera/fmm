@@ -68,6 +68,8 @@ def main():
             run_cuttlefish(mutated_filename, args.k, 64, mutated_cuttlefish_prefix)
             mutated_unitigs_file = mutated_cuttlefish_prefix + '.fa'
 
+            assert os.path.exists(mutated_unitigs_file), f"Mutated unitigs file {mutated_unitigs_file} not found"
+
             # read two sets of unitigs
 
             # run the alignment based approach to get an estimate of S D I N
