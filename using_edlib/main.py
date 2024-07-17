@@ -113,6 +113,21 @@ def compute_S_D_I_N_all(unitig_set_orig, unitig_set_mutd, k, num_threads = 64):
     return S, D, I, N
 
 
+def compute_S_D_I_N_single_threaded(unitig_set_orig, unitig_set_mutd, k, num_threads = 64):
+    # call compute_S_D_I_N using a multiprocessing pool
+    # return the sum of all the values
+    
+    S, D, I, N = 0, 0, 0, 0
+    for u1 in unitig_set_orig:
+        S_, D_, I_, N_ = compute_S_D_I_N(u1, unitig_set_mutd, k)
+        S += S_
+        D += D_
+        I += I_
+        N += N_
+
+    return S, D, I, N
+
+
 
 def estimate_rates(L, L2, S, D, fA, fA_mut):
     val1 = 3.0 * (fA_mut - 1.0*L2/4.0) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  )
@@ -235,7 +250,7 @@ def main():
     f2 = open(args.output_rates, "w")
     f2.write("ps pd d i subst_rate del_rate ins_rate subst_rate_est del_rate_est ins_rate_est\n")  
 
-    num_threads = 128
+    num_threads = 255
     pool_main = Pool(num_threads)  
 
     arg_list = []
