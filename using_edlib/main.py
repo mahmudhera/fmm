@@ -151,11 +151,12 @@ def perform_one_iteration(genome_file_prefix, ps, pd, d, i, args, unitigs_file_o
     # read true S D I N values from the mutated genome file
     S, D, I, N = read_true_SDIN_values(mutated_filename)
 
+    mutated_cuttlefish_prefix = mutated_filename + '_unitigs'
+    mutated_unitigs_file = mutated_cuttlefish_prefix + '.fa'
+    
     # run cuttlefish on the mutated genome file to generate the unitigs file, store the name of the unitigs file
     if not os.path.exists(mutated_unitigs_file):
-        mutated_cuttlefish_prefix = mutated_filename + '_unitigs'
         run_cuttlefish(mutated_filename, args.k, 64, mutated_cuttlefish_prefix)
-        mutated_unitigs_file = mutated_cuttlefish_prefix + '.fa'
 
     assert os.path.exists(mutated_unitigs_file), f"Mutated unitigs file {mutated_unitigs_file} not found"
 
