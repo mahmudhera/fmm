@@ -204,15 +204,15 @@ def perform_one_iteration(genome_file_prefix, ps, pd, d, i, args, unitigs_file_o
     unitigs_orig, unitigs_mut = read_unitigs(unitigs_file_orig), read_unitigs(mutated_unitigs_file)
 
     # run the alignment based approach to get an estimate of S D I N
-    S_est, D_est, I_est, N_est = compute_S_D_I_N_single_threaded(unitigs_orig, unitigs_mut, args.k)
-    S_est2, D_est2, I_est2, N_est2 = compute_S_D_I_N_single_threaded(unitigs_orig, unitigs_mut, args.k-1)
+    #S_est, D_est, I_est, N_est = compute_S_D_I_N_single_threaded(unitigs_orig, unitigs_mut, args.k)
+    S_est, D_est, I_est, N_est = compute_S_D_I_N_all(unitigs_orig, unitigs_mut, args.k, num_threads = 255)
 
     # estimate the mutation rates
     subst_rate, del_rate, ins_rate = estimate_rates(L, L2, S, D, fA, fA_mut)
     #subst_rate, del_rate, ins_rate = -1, -1, -1
 
     # estimate the mutation rates using estimated S and D
-    subst_rate_est, del_rate_est, ins_rate_est = estimate_rates(L, L2, S_est, D_est, fA, fA_mut, D_est2, args.k, N_est)
+    subst_rate_est, del_rate_est, ins_rate_est = estimate_rates(L, L2, S_est, D_est, fA, fA_mut, -1, args.k, N_est)
     #subst_rate_est, del_rate_est, ins_rate_est = estimate_rates(L, L2, S_est, D_est, fA, fA_mut)
 
     return ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est, subst_rate, del_rate, ins_rate, subst_rate_est, del_rate_est, ins_rate_est
@@ -276,18 +276,16 @@ def main():
     f = open(args.output_observations, "w")
     f.write("ps pd d i S D I N S_est D_est I_est N_est\n")
     f2 = open(args.output_rates, "w")
-    f2.write("ps pd d i subst_rate del_rate ins_rate subst_rate_est del_rate_est ins_rate_est\n")  
-
-    num_threads = 255
-    pool_main = Pool(num_threads)  
+    f2.write("ps pd d i subst_rate del_rate ins_rate subst_rate_est del_rate_est ins_rate_est\n")   
 
     arg_list = []
     for ps, pd, d in product(mutation_rates, repeat=3):
         for i in range(num_simulations):
             arg_list.append((genome_file_prefix, ps, pd, d, i, args, unitigs_file, L, fA))
 
-    results = pool_main.starmap(perform_one_iteration, tqdm(arg_list))
-    pool_main.close()
+    results = []
+    for arg in arg_list:
+        results.append(perform_one_iteration(*arg))
 
     for res in results:
         ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est, subst_rate, del_rate, ins_rate, subst_rate_est, del_rate_est, ins_rate_est = res
