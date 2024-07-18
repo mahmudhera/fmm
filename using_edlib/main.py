@@ -9,6 +9,9 @@ import os
 from run_cuttlefish import run_cuttlefish
 from multiprocessing import Pool
 
+import numpy as np
+from numpy.linalg import solve
+
 import edlib
 
 
@@ -129,7 +132,32 @@ def compute_S_D_I_N_single_threaded(unitig_set_orig, unitig_set_mutd, k, num_thr
 
 
 
-def estimate_rates(L, L2, S, D, fA, fA_mut):
+def estimate_rates(L, L2, S, D, fA, fA_mut, D2=None, k=None):
+    r = 1.0 * D / D2 * k / (k-1)
+    # solve a system of three linear equations to estimate the rates
+    a1 = 1.0 * (L - fA) / 3.0 - fA
+    b1 = -fA
+    c1 = L/4.0
+    d1 = fA_mut - fA
+
+    a2 = 0
+    b2 = -1
+    c2 = 1
+    d2 = 1.0*L2/L - 1
+
+    a3 = 1
+    b3 = 1
+    c3 = r
+    d3 = 1.0 - r
+
+    A = np.array([[a1, b1, c1], [a2, b2, c2], [a3, b3, c3]])
+    b = np.array([d1, d2, d3])
+    x = solve(A, b)
+
+    subst_rate, del_rate, ins_rate = x
+
+
+    '''
     val1 = 3.0 * (fA_mut - 1.0*L2/4.0) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  )
     val2 = 3.0 * (4.0 * S * fA_mut / (4.0*S + 3.0*D) - L2 * S / (4.0*S + 3.0*D) ) / (L - 4.0 * fA)
     assert abs(val1 - val2) < 1e-6
@@ -145,6 +173,7 @@ def estimate_rates(L, L2, S, D, fA, fA_mut):
     subst_rate = 3.0 * (fA_mut - fA + 1.0*L/4 - 1.0*L2/4) / (  (L-4.0*fA) * (1 + 3.0*D/(4.0*S))  )
     del_rate = 1.0 * D * subst_rate / S
     ins_rate = 1.0 * L2 / L - 1.0 + del_rate
+    '''
 
     return subst_rate, del_rate, ins_rate
 
@@ -180,9 +209,10 @@ def perform_one_iteration(genome_file_prefix, ps, pd, d, i, args, unitigs_file_o
 
     # run the alignment based approach to get an estimate of S D I N
     S_est, D_est, I_est, N_est = compute_S_D_I_N_single_threaded(unitigs_orig, unitigs_mut, args.k)
+    S_est2, D_est2, I_est2, N_est2 = compute_S_D_I_N_single_threaded(unitigs_orig, unitigs_mut, args.k-1)
 
     # estimate the mutation rates
-    subst_rate, del_rate, ins_rate = estimate_rates(L, L2, S, D, fA, fA_mut)
+    subst_rate, del_rate, ins_rate = estimate_rates(L, L2, S, D, fA, fA_mut, D2=D_est2, k=args.k)
 
     # estimate the mutation rates using estimated S and D
     subst_rate_est, del_rate_est, ins_rate_est = estimate_rates(L, L2, S_est, D_est, fA, fA_mut)
