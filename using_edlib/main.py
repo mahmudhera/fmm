@@ -150,7 +150,7 @@ def estimate_rates(L, L2, S, D, fA, fA_mut, D2=None, k=None):
         d3 = 0
     
     else:
-        r = 1.0 * D * (k-1) / (D2 * k)
+        r = 1.0 * D * (k-1) * (L - k + 2) / (D2 * k * (L - k + 1))
         # solve a system of three linear equations to estimate the rates
         a1 = 1.0 * (L - fA) / 3.0 - fA
         b1 = - fA
@@ -214,8 +214,8 @@ def perform_one_iteration(genome_file_prefix, ps, pd, d, i, args, unitigs_file_o
     #subst_rate, del_rate, ins_rate = -1, -1, -1
 
     # estimate the mutation rates using estimated S and D
-    #subst_rate_est, del_rate_est, ins_rate_est = estimate_rates(L, L2, S_est, D_est, fA, fA_mut, D_est2, args.k)
-    subst_rate_est, del_rate_est, ins_rate_est = estimate_rates(L, L2, S_est, D_est, fA, fA_mut)
+    subst_rate_est, del_rate_est, ins_rate_est = estimate_rates(L, L2, S_est, D_est, fA, fA_mut, D_est2, args.k)
+    #subst_rate_est, del_rate_est, ins_rate_est = estimate_rates(L, L2, S_est, D_est, fA, fA_mut)
 
     return ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est, subst_rate, del_rate, ins_rate, subst_rate_est, del_rate_est, ins_rate_est
 
