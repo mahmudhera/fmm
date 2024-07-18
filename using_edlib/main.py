@@ -130,7 +130,7 @@ def compute_S_D_I_N_single_threaded(unitig_set_orig, unitig_set_mutd, k, num_thr
 
 
 
-def estimate_rates(L, L2, S, D, fA, fA_mut, D2=None, k=None):
+def estimate_rates(L, L2, S, D, fA, fA_mut, D2=None, k=None, N=None):
     if D2 is None:
         a1 = 1.0 * (L - fA) / 3.0 - fA
         b1 = - fA
@@ -161,9 +161,9 @@ def estimate_rates(L, L2, S, D, fA, fA_mut, D2=None, k=None):
         d2 = 1.0*L2/L - 1
 
         a3 = 1
-        b3 = 1
-        c3 = r
-        d3 = 1.0 - r
+        b3 = 1.0 * N * k / D + 1
+        c3 = 0
+        d3 = 1.0
 
     A = np.array([[a1, b1, c1], [a2, b2, c2], [a3, b3, c3]])
     b = np.array([d1, d2, d3])
@@ -212,7 +212,7 @@ def perform_one_iteration(genome_file_prefix, ps, pd, d, i, args, unitigs_file_o
     #subst_rate, del_rate, ins_rate = -1, -1, -1
 
     # estimate the mutation rates using estimated S and D
-    subst_rate_est, del_rate_est, ins_rate_est = estimate_rates(L, L2, S_est, D_est, fA, fA_mut, D_est2, args.k)
+    subst_rate_est, del_rate_est, ins_rate_est = estimate_rates(L, L2, S_est, D_est, fA, fA_mut, D_est2, args.k, N_est)
     #subst_rate_est, del_rate_est, ins_rate_est = estimate_rates(L, L2, S_est, D_est, fA, fA_mut)
 
     return ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est, subst_rate, del_rate, ins_rate, subst_rate_est, del_rate_est, ins_rate_est
