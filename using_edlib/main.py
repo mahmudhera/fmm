@@ -151,7 +151,7 @@ def estimate_rates(L, L2, S, D, fA, fA_mut, D2=None, k=None):
         ins_rate = 1.0 * L2 / L - 1.0 + del_rate
     
     else:
-        r = 1.0 * D / D2 * k / (k-1)
+        r = 1.0 * D / D2 * (k-1) / (k)
         # solve a system of three linear equations to estimate the rates
         a1 = 1.0 * (L - fA) / 3.0 - fA
         b1 = -fA
