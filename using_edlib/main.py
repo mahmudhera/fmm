@@ -17,10 +17,8 @@ import edlib
 
 
 def compute_S_D_I_N(u1, unitig_set_mutd, k):
-    
     num_kmers_single_subst, num_kmers_single_delt, num_kmers_no_mutation = 0, 0, 0
     num_kmers_single_insertion = 0
-    k = 21
 
     for u2 in unitig_set_mutd:
         alignment, distance, st1, st2 = None, 9999999999, None, None
