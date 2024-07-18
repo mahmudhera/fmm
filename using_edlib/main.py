@@ -211,8 +211,8 @@ def perform_one_iteration(genome_file_prefix, ps, pd, d, i, args, unitigs_file_o
     S_est2, D_est2, I_est2, N_est2 = compute_S_D_I_N_single_threaded(unitigs_orig, unitigs_mut, args.k-1)
 
     # estimate the mutation rates
-    #subst_rate, del_rate, ins_rate = estimate_rates(L, L2, S, D, fA, fA_mut)
-    subst_rate, del_rate, ins_rate = -1, -1, -1
+    subst_rate, del_rate, ins_rate = estimate_rates(L, L2, S, D, fA, fA_mut)
+    #subst_rate, del_rate, ins_rate = -1, -1, -1
 
     # estimate the mutation rates using estimated S and D
     subst_rate_est, del_rate_est, ins_rate_est = estimate_rates(L, L2, S_est, D_est, fA, fA_mut, D_est2, args.k)
