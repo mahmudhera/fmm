@@ -283,12 +283,8 @@ def main():
         for i in range(num_simulations):
             arg_list.append((genome_file_prefix, ps, pd, d, i, args, unitigs_file, L, fA))
 
-    results = []
-    for arg in arg_list:
-        results.append(perform_one_iteration(*arg))
-
-    for res in results:
-        ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est, subst_rate, del_rate, ins_rate, subst_rate_est, del_rate_est, ins_rate_est = res
+    for arg in tqdm(arg_list):
+        ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est, subst_rate, del_rate, ins_rate, subst_rate_est, del_rate_est, ins_rate_est = perform_one_iteration(*arg)
         # write these values to the output file
         f.write(f"{ps} {pd} {d} {i} {S} {D} {I} {N} {S_est} {D_est} {I_est} {N_est}\n")
         print("True S D I N values:", ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est)
