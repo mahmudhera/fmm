@@ -321,6 +321,9 @@ def main():
         for i in range(num_simulations):
             arg_list.append((genome_file_prefix, ps, pd, d, i, args, unitigs_file, L, fA))
 
+    # show already_computed_set
+    print("Already computed set:", already_computed_set)
+
     for arg in tqdm(arg_list):
         if tuple(arg[1:5]) in already_computed_set:
             continue
