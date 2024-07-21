@@ -305,17 +305,19 @@ def main():
     # open the output observations file as a pandas dataframe
     try:
         df = pd.read_csv(args.output_rates, sep=" ")
+        print(df)
         already_computed_set = set(zip(df['ps'], df['pd'], df['d'], df['i']))
     except:
         already_computed_set = set()
 
 
     # open the output files
-    f = open(args.output_observations, "a")
-    if len(already_computed_set) == 0:
-        f.write("ps pd d i S D I N S_est D_est I_est N_est\n")
-    f2 = open(args.output_rates, "w")
-    f2.write("ps pd d i subst_rate del_rate ins_rate subst_rate_est del_rate_est ins_rate_est\n")   
+    f = open(args.output_observations, "w")
+    f.write("ps pd d i S D I N S_est D_est I_est N_est\n")
+    f2 = open(args.output_rates, "a")
+    if len(already_computed_set) == 0:  
+        f2.write("ps pd d i subst_rate del_rate ins_rate subst_rate_est del_rate_est ins_rate_est\n")   
+
 
     arg_list = []
     for ps, pd, d in product(mutation_rates, repeat=3):
