@@ -8,12 +8,9 @@ import numpy as np
 import os
 from run_cuttlefish import run_cuttlefish
 from multiprocessing import Pool
-
 import numpy as np
 from numpy.linalg import solve
-
 import edlib
-
 import pandas as pd
 
 
@@ -301,6 +298,8 @@ def main():
     genome_string = read_genome(args.genome_filename)
     L = len(genome_string)
     fA = genome_string.count('A') 
+
+    import pandas as pd
 
     # open the output observations file as a pandas dataframe
     df = pd.read_csv(args.output_rates, sep=" ")
