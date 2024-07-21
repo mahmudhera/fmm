@@ -303,12 +303,9 @@ def main():
     fA = genome_string.count('A') 
 
     # open the output observations file as a pandas dataframe
-    try:
-        df = pd.read_csv(args.output_rates, sep=" ")
-        print(df)
-        already_computed_set = set(zip(df['ps'], df['pd'], df['d'], df['i']))
-    except:
-        already_computed_set = set()
+    df = pd.read_csv(args.output_rates, sep=" ")
+    print(df)
+    already_computed_set = set(zip(df['ps'], df['pd'], df['d'], df['i']))
 
     print("Already computed set:", already_computed_set)
 
