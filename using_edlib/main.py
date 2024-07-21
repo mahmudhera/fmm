@@ -329,10 +329,12 @@ def main():
     # show already_computed_set
     print("Already computed set:", already_computed_set)
 
+    num_completed = 0
     for arg in tqdm(arg_list):
-        print (tuple(arg[1:5]), tuple(arg[1:5]) in already_computed_set)
         if tuple(arg[1:5]) in already_computed_set:
+            num_completed += 1
             continue
+        print("Performing iteration: num_completed+1")
         ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est, subst_rate, del_rate, ins_rate, subst_rate_est, del_rate_est, ins_rate_est = perform_one_iteration(*arg)
         # write these values to the output file
         f.write(f"{ps} {pd} {d} {i} {S} {D} {I} {N} {S_est} {D_est} {I_est} {N_est}\n")
