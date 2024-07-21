@@ -14,6 +14,8 @@ from numpy.linalg import solve
 
 import edlib
 
+import pandas as pd
+
 
 
 def compute_S_D_I_N(u1, unitig_set_mutd, k):
@@ -175,6 +177,30 @@ def estimate_rates(L, L2, S, D, fA, fA_mut, D2=None, k=None, N=None):
 
 
 
+def split_unitigs(unitigs):
+    return_list = []
+    for u in unitigs:
+        if len(u) < 6000:
+            return_list.append(u)
+        else:
+            num_splits = len(u) / 5000
+            # round up
+            num_splits = int(num_splits) + 1
+            for i in range(num_splits):
+                start = i * 5000
+                end = min((i+1) * 5000, len(u))
+                if start >= end:
+                    break
+                return_list.append(u[start:end])
+                start = end - (k-1)
+                end = min(end + k, len(u))
+                if start >= end:
+                    break
+                return_list.append(u[start:end])
+    return return_list
+
+
+
 def perform_one_iteration(genome_file_prefix, ps, pd, d, i, args, unitigs_file_orig, L, fA):
     # create the mutated genome file using these mutation rates. args = genome_filename, ps, pd, d, seed, output_filename, k
     mutated_filename = genome_file_prefix + "_mutated_" + str(ps) + "_" + str(pd) + "_" + str(d) + "_" + str(i) + ".fasta"
@@ -202,6 +228,10 @@ def perform_one_iteration(genome_file_prefix, ps, pd, d, i, args, unitigs_file_o
 
     # read two sets of unitigs
     unitigs_orig, unitigs_mut = read_unitigs(unitigs_file_orig), read_unitigs(mutated_unitigs_file)
+
+    # split the unitigs into smaller pieces
+    unitigs_orig = split_unitigs(unitigs_orig)
+    unitigs_mut = split_unitigs(unitigs_mut)
 
     # run the alignment based approach to get an estimate of S D I N
     #S_est, D_est, I_est, N_est = compute_S_D_I_N_single_threaded(unitigs_orig, unitigs_mut, args.k)
@@ -272,6 +302,14 @@ def main():
     L = len(genome_string)
     fA = genome_string.count('A') 
 
+    # open the output observations file as a pandas dataframe
+    try:
+        df = pd.read_csv(args.output_observations, sep=" ")
+        already_computed_set = set(zip(df['ps'], df['pd'], df['d'], df['i']))
+    except:
+        already_computed_set = set()
+
+
     # open the output files
     f = open(args.output_observations, "w")
     f.write("ps pd d i S D I N S_est D_est I_est N_est\n")
@@ -284,6 +322,8 @@ def main():
             arg_list.append((genome_file_prefix, ps, pd, d, i, args, unitigs_file, L, fA))
 
     for arg in tqdm(arg_list):
+        if tuple(arg[1:5]) in already_computed_set:
+            continue
         ps, pd, d, i, S, D, I, N, S_est, D_est, I_est, N_est, subst_rate, del_rate, ins_rate, subst_rate_est, del_rate_est, ins_rate_est = perform_one_iteration(*arg)
         # write these values to the output file
         f.write(f"{ps} {pd} {d} {i} {S} {D} {I} {N} {S_est} {D_est} {I_est} {N_est}\n")
