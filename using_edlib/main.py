@@ -302,13 +302,15 @@ def main():
     import pandas as pd
 
     # open the output observations file as a pandas dataframe
-    df = pd.read_csv(args.output_rates, sep=" ")
-    print(df)
-    already_computed_set = set(zip(df['ps'], df['pd'], df['d'], df['i']))
+    try:
+        df = pd.read_csv(args.output_rates, sep=" ")
+        print(df)
+        already_computed_set = set(zip(df['ps'], df['pd'], df['d'], df['i']))
 
-    print("Already computed set:", already_computed_set)
-
-    exit(0)
+        print("Already computed set:", already_computed_set)
+    except:
+        already_computed_set = set()
+        print("No file found")
 
 
     # open the output files
