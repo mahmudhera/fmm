@@ -310,6 +310,10 @@ def main():
     except:
         already_computed_set = set()
 
+    print("Already computed set:", already_computed_set)
+
+    exit(0)
+
 
     # open the output files
     f = open(args.output_observations, "w")
