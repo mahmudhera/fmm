@@ -177,7 +177,7 @@ def estimate_rates(L, L2, S, D, fA, fA_mut, D2=None, k=None, N=None):
 
 
 
-def split_unitigs(unitigs):
+def split_unitigs(unitigs, k):
     return_list = []
     for u in unitigs:
         if len(u) < 6000:
@@ -230,8 +230,8 @@ def perform_one_iteration(genome_file_prefix, ps, pd, d, i, args, unitigs_file_o
     unitigs_orig, unitigs_mut = read_unitigs(unitigs_file_orig), read_unitigs(mutated_unitigs_file)
 
     # split the unitigs into smaller pieces
-    unitigs_orig = split_unitigs(unitigs_orig)
-    unitigs_mut = split_unitigs(unitigs_mut)
+    unitigs_orig = split_unitigs(unitigs_orig, args.k)
+    unitigs_mut = split_unitigs(unitigs_mut, args.k)
 
     # run the alignment based approach to get an estimate of S D I N
     #S_est, D_est, I_est, N_est = compute_S_D_I_N_single_threaded(unitigs_orig, unitigs_mut, args.k)
