@@ -20,7 +20,8 @@ def parse_args():
     return parser.parse_args()
 
 def compute_subst_rate(kmers_orig, kmers_mut, L1, L2):
-    L = (L1+L2)/2
+    #L = (L1+L2)/2
+    L = L1
     num_intersection = len(set(kmers_orig).intersection(set(kmers_mut)))
     #num_intersection = (L - k + 1) * (1 - ps)^k -- for the simple mutation model
     one_minus_ps = (num_intersection / (L - k + 1))**(1.0/k)
